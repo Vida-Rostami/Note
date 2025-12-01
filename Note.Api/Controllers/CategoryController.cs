@@ -7,40 +7,45 @@ namespace Note.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ICategoryServices
+    public class CategoryController
     {
-        public CategoryController()
-        {
+        private readonly ICategoryServices _categoryServices;
 
+        public CategoryController(ICategoryServices categoryServices)
+        {
+            _categoryServices = categoryServices;
         }
 
         //add update by http method
 
         [HttpGet]
-        public Task<BaseResponse<GetCategoryModel>> Get()
+        public async Task<BaseResponse<GetCategoryModel>> Get()
         {
-            throw new NotImplementedException();
+            return await _categoryServices.Get();
         }
 
         [HttpGet("id")]
-        public Task<BaseResponse<GetCategoryModel>> Get([FromRoute]int catgoryId)
+        public async Task<BaseResponse<GetCategoryModel>> Get([FromRoute] int catgoryId)
         {
-            throw new NotImplementedException();
+            return await _categoryServices.Get(catgoryId);
         }
+
         [HttpPost]
         public Task<BaseResponse> Insert(AddCategoryModel model)
         {
-            throw new NotImplementedException();
+            return _categoryServices.Insert(model);
         }
+
         [HttpPut]
         public Task<BaseResponse> Update(UpdateCategoryModel model)
         {
-            throw new NotImplementedException();
+            return _categoryServices.Update(model);
         }
+
         [HttpDelete]
-        public Task<BaseResponse> Delete(int categoryId)
+        public async Task<BaseResponse> Delete(int categoryId)
         {
-            throw new NotImplementedException();
+            return await (_categoryServices.Delete(categoryId));
         }
     }
 }

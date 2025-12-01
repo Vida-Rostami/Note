@@ -1,4 +1,5 @@
-﻿using Note.Model;
+﻿using Note.Infrastructure.Category;
+using Note.Model;
 using Note.Model.Category;
 using System;
 using System.Collections.Generic;
@@ -10,33 +11,36 @@ namespace Note.Application.Category
 {
     public class CategoryServices : ICategoryServices
     {
-        public CategoryServices()
+        private readonly ICategoryRepository _categoryRepository;
+
+        public CategoryServices(ICategoryRepository categoryRepository)
         {
-            
+            _categoryRepository = categoryRepository;
         }
 
-        public Task<BaseResponse<GetCategoryModel>> Get()
+        public async Task<BaseResponse<GetCategoryModel>> Get()
         {
-            throw new NotImplementedException();
+            return await _categoryRepository.Get();
         }
 
-        public Task<BaseResponse<GetCategoryModel>> Get(int catgoryId)
+        public async Task<BaseResponse<GetCategoryModel>> Get(int catgoryId)
         {
-            throw new NotImplementedException();
+            return await _categoryRepository.Get(catgoryId);
         }
 
-        public Task<BaseResponse> Insert(AddCategoryModel model)
+        public async Task<BaseResponse> Insert(AddCategoryModel model)
         {
-            throw new NotImplementedException();
+            return await _categoryRepository.Insert(model);
         }
 
-        public Task<BaseResponse> Update(UpdateCategoryModel model)
+        public async Task<BaseResponse> Update(UpdateCategoryModel model)
         {
-            throw new NotImplementedException();
+            return await _categoryRepository.Update(model);
         }
-        public Task<BaseResponse> Delete(int categoryId)
+
+        public async Task<BaseResponse> Delete(int categoryId)
         {
-            throw new NotImplementedException();
+            return await _categoryRepository.Delete(categoryId);
         }
     }
 }
