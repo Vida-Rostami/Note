@@ -1,33 +1,39 @@
-﻿using Note.Model;
+﻿using Note.Infrastructure.Note;
+using Note.Model;
 using Note.Model.Note;
 
 namespace Note.Application.Note
 {
     public class NoteServices : INoteServices
     {
+        private readonly INoteRepository _noteRepository;
 
-        public Task<BaseResponse<GetNoteModel>> GetNote()
+        public NoteServices(INoteRepository noteRepository)
         {
-            throw new NotImplementedException();
+            _noteRepository = noteRepository;
+        }
+        public async Task<BaseResponse<GetNoteModel>> GetNote()
+        {
+            return await _noteRepository.GetNote();
         }
 
-        public Task<BaseResponse<GetNoteModel>> GetNote(int catgoryId)
+        public async Task<BaseResponse<GetNoteModel>> GetNote(int noteId)
         {
-            throw new NotImplementedException();
+            return await _noteRepository.GetNote(noteId);
         }
 
-        public Task<BaseResponse> InsertNote(AddNoteModel model)
+        public async Task<BaseResponse> InsertNote(AddNoteModel model)
         {
-            throw new NotImplementedException();
+            return await _noteRepository.InsertNote(model);
         }
 
-        public Task<BaseResponse> UpdateNote(UpdateNoteModel model)
+        public async Task<BaseResponse> UpdateNote(UpdateNoteModel model)
         {
-            throw new NotImplementedException();
+            return await _noteRepository.UpdateNote(model);
         }
-        public Task<BaseResponse> DeleteNote(int NoteId)
+        public async Task<BaseResponse> DeleteNote(int NoteId)
         {
-            throw new NotImplementedException();
+            return await _noteRepository.DeleteNote(NoteId);
         }
     }
 }

@@ -7,9 +7,11 @@ namespace Note.Infrastructure.Category
 
     public class CategoryRepository : ICategoryRepository
     {
-        public CategoryRepository()
-        {
+        private readonly IOptions<DatabaseSettings> _options;
 
+        public CategoryRepository(IOptions<DatabaseSettings> options)
+        {
+            _options = options;
         }
         public Task<BaseResponse<GetCategoryModel>> Get()
         {

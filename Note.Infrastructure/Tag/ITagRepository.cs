@@ -9,6 +9,6 @@ namespace Note.Infrastructure.Tag
         Task<BaseResponse<GetTagModel>> GetTag(int tagId);
         Task<BaseResponse> InsertTag(AddTagModel model); 
         Task<BaseResponse> UpdateTag(UpdateTagModel model);
-        Task<BaseResponse> DeleteTag(int TagId);
+        Task<BaseResponse> DeleteTag(int tagId);
     }
 }

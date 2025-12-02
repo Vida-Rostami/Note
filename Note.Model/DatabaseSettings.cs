@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Note.Model.Category
+namespace Note.Model
 {
-    public class AddCategoryModel
+    public class DatabaseSettings
     {
-        public string CategoryName { get; set; }
+        public string OracleConnection { get; set; }
     }
 }

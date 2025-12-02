@@ -1,4 +1,12 @@
 
+using Note.Application.Category;
+using Note.Application.Note;
+using Note.Application.Tag;
+using Note.Infrastructure.Category;
+using Note.Infrastructure.Note;
+using Note.Infrastructure.Tag;
+using Note.Model;
+
 namespace Note.Api
 {
     public class Program
@@ -7,12 +15,19 @@ namespace Note.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("ConnectionStrings"));
+            builder.Services.AddScoped<INoteServices, NoteServices>();
+            builder.Services.AddScoped<ITagServices,ITagServices>();
+            builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+
+            builder.Services.AddScoped<INoteRepository, NoteRepository>();
+            builder.Services.AddScoped<ITagRepository, TagRepository>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             var app = builder.Build();
 
@@ -24,7 +39,6 @@ namespace Note.Api
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
 
 

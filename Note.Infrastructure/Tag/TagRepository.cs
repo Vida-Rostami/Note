@@ -11,9 +11,10 @@ namespace Note.Infrastructure.Tag
 
     public class TagRepository : ITagRepository
     {
-        public TagRepository()
+        private DatabaseSettings _option;
+        public TagRepository(IOptions<DatabaseSettings> options)
         {
-            
+            _option = options.Value;
         }
 
         public Task<BaseResponse<GetTagModel>> GetTag()
@@ -35,7 +36,7 @@ namespace Note.Infrastructure.Tag
         {
             throw new NotImplementedException();
         }
-        public Task<BaseResponse> DeleteTag(int TagId)
+        public Task<BaseResponse> DeleteTag(int tagId)
         {
             throw new NotImplementedException();
         }

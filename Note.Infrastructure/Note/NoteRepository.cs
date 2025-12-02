@@ -5,9 +5,11 @@ namespace Note.Infrastructure.Note
 {
     public class NoteRepository : INoteRepository
     {
-        public NoteRepository()
+        private readonly IOptions<DatabaseSettings> _options;
+
+        public NoteRepository(IOptions<DatabaseSettings> options)
         {
-            
+            _options = options;
         }
 
         public Task<BaseResponse<GetNoteModel>> GetNote()
@@ -15,7 +17,7 @@ namespace Note.Infrastructure.Note
             throw new NotImplementedException();
         }
 
-        public Task<BaseResponse<GetNoteModel>> GetNote(int catgoryId)
+        public Task<BaseResponse<GetNoteModel>> GetNote(int noteId)
         {
             throw new NotImplementedException();
         }
@@ -29,7 +31,7 @@ namespace Note.Infrastructure.Note
         {
             throw new NotImplementedException();
         }
-        public Task<BaseResponse> DeleteNote(int NoteId)
+        public Task<BaseResponse> DeleteNote(int noteId)
         {
             throw new NotImplementedException();
         }

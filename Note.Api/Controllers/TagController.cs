@@ -8,40 +8,42 @@ namespace Note.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TagController : ITagServices
+    public class TagController
     {
-        public TagController()
+        private readonly ITagServices _tagServices;
+
+        public TagController(ITagServices tagServices)
         {
-            
+            _tagServices = tagServices;
         }
         [HttpGet]
-        public Task<BaseResponse<GetTagModel>> GetTag()
+        public async Task<BaseResponse<GetTagModel>> GetTag()
         {
-            throw new NotImplementedException();
+            return await _tagServices.GetTag();
         }
 
         [HttpGet]
-        public Task<BaseResponse<GetTagModel>> GetTag(int catgtagIdoryId)
+        public async Task<BaseResponse<GetTagModel>> GetTag(int tagId)
         {
-            throw new NotImplementedException();
+            return await _tagServices.GetTag(tagId);
         }
 
         [HttpPost]
-        public Task<BaseResponse> InsertTag(AddTagModel model)
+        public async Task<BaseResponse> InsertTag(AddTagModel model)
         {
-            throw new NotImplementedException();
+            return await _tagServices.InsertTag(model);
         }
 
         [HttpPut]
-        public Task<BaseResponse> UpdateTag(UpdateTagModel model)
+        public async Task<BaseResponse> UpdateTag(UpdateTagModel model)
         {
-            throw new NotImplementedException();
+            return await _tagServices.UpdateTag(model);
         }
 
         [HttpDelete]
-        public Task<BaseResponse> DeleteTag(int TagId)
+        public async Task<BaseResponse> DeleteTag(int tagId)
         {
-            throw new NotImplementedException();
+            return await _tagServices.DeleteTag(tagId);
         }
     }
 }

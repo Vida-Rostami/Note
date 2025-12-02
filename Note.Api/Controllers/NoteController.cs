@@ -7,32 +7,37 @@ namespace Note.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class NoteController : INoteServices
+    public class NoteController 
     {
+        private readonly INoteServices _noteServices;
 
-        public Task<BaseResponse<GetNoteModel>> GetNote()
+        public NoteController(INoteServices noteServices)
         {
-            throw new NotImplementedException();
+            _noteServices = noteServices;
         }
 
-        public Task<BaseResponse<GetNoteModel>> GetNote(int catgoryId)
+        public async Task<BaseResponse<GetNoteModel>> GetNote()
         {
-            throw new NotImplementedException();
+            return await _noteServices.GetNote();
         }
 
-        public Task<BaseResponse> InsertNote(AddNoteModel model)
+        public async Task<BaseResponse<GetNoteModel>> GetNote(int noteId)
         {
-            throw new NotImplementedException();
+           return await _noteServices.GetNote(noteId);
         }
 
-        public Task<BaseResponse> UpdateNote(UpdateNoteModel model)
+        public async Task<BaseResponse> InsertNote(AddNoteModel model)
         {
-            throw new NotImplementedException();
+            return await _noteServices.InsertNote(model);
         }
-        public async Task<BaseResponse> DeleteNote(int NoteId)
+
+        public async Task<BaseResponse> UpdateNote(UpdateNoteModel model)
         {
-            ///return await 
-            throw new NotImplementedException();
+           return await _noteServices.UpdateNote(model);
+        }
+        public async Task<BaseResponse> DeleteNote(int noteId)
+        {
+            return await _noteServices.DeleteNote(noteId);
         }
     }
 }

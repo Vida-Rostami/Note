@@ -11,9 +11,9 @@ namespace Note.Application.Note
     public interface INoteServices
     {
         Task<BaseResponse<GetNoteModel>> GetNote();
-        Task<BaseResponse<GetNoteModel>> GetNote(int catgoryId);
+        Task<BaseResponse<GetNoteModel>> GetNote(int noteId);
         Task<BaseResponse> InsertNote(AddNoteModel model);
         Task<BaseResponse> UpdateNote(UpdateNoteModel model);
-        Task<BaseResponse> DeleteNote(int NoteId);
+        Task<BaseResponse> DeleteNote(int noteId);
     }
 }

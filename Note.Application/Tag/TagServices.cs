@@ -1,4 +1,5 @@
-﻿using Note.Model;
+﻿using Note.Infrastructure.Tag;
+using Note.Model;
 using Note.Model.Tag;
 using System;
 using System.Collections.Generic;
@@ -10,33 +11,35 @@ namespace Note.Application.Tag
 {
     internal class TagServices : ITagServices
     {
-        public TagServices()
+        private readonly ITagRepository _tagRepository;
+
+        public TagServices(ITagRepository tagRepository)
         {
-            
+            _tagRepository = tagRepository;
         }
 
-        public Task<BaseResponse<GetTagModel>> GetTag()
+        public async Task<BaseResponse<GetTagModel>> GetTag()
         {
-            throw new NotImplementedException();
+            return await _tagRepository.GetTag();
         }
 
-        public Task<BaseResponse<GetTagModel>> GetTag(int tagId)
+        public async Task<BaseResponse<GetTagModel>> GetTag(int tagId)
         {
-            throw new NotImplementedException();
+            return await _tagRepository.GetTag(tagId);
         }
 
-        public Task<BaseResponse> InsertTag(AddTagModel model)
+        public async Task<BaseResponse> InsertTag(AddTagModel model)
         {
-            throw new NotImplementedException();
+            return await _tagRepository.InsertTag(model);   
         }
 
-        public Task<BaseResponse> UpdateTag(UpdateTagModel model)
+        public async Task<BaseResponse> UpdateTag(UpdateTagModel model)
         {
-            throw new NotImplementedException();
+            return await _tagRepository.UpdateTag(model);
         }
-        public Task<BaseResponse> DeleteTag(int TagId)
+        public async Task<BaseResponse> DeleteTag(int tagId)
         {
-            throw new NotImplementedException();
+            return await _tagRepository.DeleteTag(tagId);
         }
     }
 }
