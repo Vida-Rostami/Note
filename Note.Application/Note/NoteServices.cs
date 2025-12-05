@@ -12,7 +12,7 @@ namespace Note.Application.Note
         {
             _noteRepository = noteRepository;
         }
-        public async Task<BaseResponse<GetNoteModel>> GetNote()
+        public async Task<BaseResponse<List<GetNoteModel>>> GetNote()
         {
             return await _noteRepository.GetNote();
         }

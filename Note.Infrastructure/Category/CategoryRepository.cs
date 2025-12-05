@@ -1,12 +1,9 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic.FileIO;
 using Note.Model;
 using Note.Model.Category;
-using Note.Model.Tag;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
-using System.Reflection;
 
 namespace Note.Infrastructure.Category
 {
@@ -132,7 +129,7 @@ namespace Note.Infrastructure.Category
             }
         }
 
-        public async Task<BaseResponse<GetCategoryModel>>Get1(int categoryId)
+        public async Task<BaseResponse<GetCategoryModel>> Get1(int categoryId)
         {
             try
             {
@@ -154,7 +151,8 @@ namespace Note.Infrastructure.Category
 
                 // دپارس کردن ریدر به لیست RoomModel
                 var categoryModel = new GetCategoryModel();
-                while (await reader.ReadAsync()) {
+                while (await reader.ReadAsync())
+                {
                     {
                         categoryModel.CategoryName = reader.GetString("CategoryName"); //? (cate?)null : Enum.Parse<RoomType>(reader.GetString(reader.GetOrdinal("ROOMTYPE"))),
                     };
@@ -162,15 +160,15 @@ namespace Note.Infrastructure.Category
 
                 //if (!roomModels.Any())
                 //{
-                    //return new BaseResponse<GetCategoryModel>
-                    //{
-                    //    IsSuccess = true,
-                    //    Message = "در هتل مورد نظر اتاقی یافت نشد",
-                    //    Code = 201
-                    //};
-              //  }
+                //return new BaseResponse<GetCategoryModel>
+                //{
+                //    IsSuccess = true,
+                //    Message = "در هتل مورد نظر اتاقی یافت نشد",
+                //    Code = 201
+                //};
+                //  }
 
-              //  var roomDtos = _mapper.Map<IEnumerable<RoomResponseDto>>(roomModels);
+                //  var roomDtos = _mapper.Map<IEnumerable<RoomResponseDto>>(roomModels);
 
                 return new BaseResponse<GetCategoryModel>
                 {

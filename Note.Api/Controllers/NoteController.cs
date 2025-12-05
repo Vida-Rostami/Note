@@ -17,13 +17,13 @@ namespace Note.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<BaseResponse<GetNoteModel>> GetNote()
+        public async Task<BaseResponse<List<GetNoteModel>>> GetNote()
         {
             return await _noteServices.GetNote();
         }
 
         [HttpGet("noteId")]
-        public async Task<BaseResponse<GetNoteModel>> GetNote(int noteId)
+        public async Task<BaseResponse<GetNoteModel>> GetNote([FromQuery]int noteId)
         {
            return await _noteServices.GetNote(noteId);
         }

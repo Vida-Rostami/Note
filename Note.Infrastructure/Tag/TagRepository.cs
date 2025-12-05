@@ -2,15 +2,9 @@
 using Microsoft.Extensions.Options;
 using Note.Model;
 using Note.Model.Tag;
-
-
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data;
 using Oracle.ManagedDataAccess.Client;
-using System.Reflection;
-using Microsoft.VisualBasic.FileIO;
+using System.Data;
+using System.Text;
 namespace Note.Infrastructure.Tag
 {
 
@@ -46,7 +40,7 @@ namespace Note.Infrastructure.Tag
                         TagId = reader.GetInt32(reader.GetOrdinal("TagId")),
                         TagName = reader.GetString("TagName"),
                         CreateDateTime = reader.IsDBNull(reader.GetOrdinal("CreateDateTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
-                        ModifyDateTime = reader.IsDBNull(reader.GetOrdinal("ModifyDateTime")) ? null :(reader.GetDateTime(reader.GetOrdinal("ModifyDateTime"))),
+                        ModifyDateTime = reader.IsDBNull(reader.GetOrdinal("ModifyDateTime")) ? null : (reader.GetDateTime(reader.GetOrdinal("ModifyDateTime"))),
                     };
                     tags.Add(tag);
                 }
@@ -172,7 +166,7 @@ namespace Note.Infrastructure.Tag
                     return new BaseResponse
                     {
                         IsSuccess = true,
-                        Code = 201,
+                        Code = 200,
                         Message = "با موفقیت اپدیت شد",
                     };
                 }
@@ -201,7 +195,7 @@ namespace Note.Infrastructure.Tag
                     return new BaseResponse
                     {
                         IsSuccess = true,
-                        Code = 201,
+                        Code = 200,
                         Message = "با موفقیت حذف شد",
                     };
                 }
