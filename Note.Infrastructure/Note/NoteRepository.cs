@@ -1,4 +1,5 @@
-﻿using Note.Model;
+﻿using Microsoft.Extensions.Options;
+using Note.Model;
 using Note.Model.Note;
 
 namespace Note.Infrastructure.Note

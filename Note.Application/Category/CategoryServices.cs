@@ -18,7 +18,7 @@ namespace Note.Application.Category
             _categoryRepository = categoryRepository;
         }
 
-        public async Task<BaseResponse<GetCategoryModel>> Get()
+        public async Task<BaseResponse<List<GetCategoryModel>>> Get()
         {
             return await _categoryRepository.Get();
         }

@@ -29,12 +29,13 @@ namespace Note.Model.Common
             }
         }
 
-        public static string ConvertGregorianToPersian(DateTime dateTime)
-        {
-            DateTime d = DateTime.Parse(dateTime);
-            PersianCalendar pc = new PersianCalendar();
-           var persianDateString = string.Format("{0}/{1}/{2}", pc.GetYear(d), pc.GetMonth(d), pc.GetDayOfMonth(d));
-            return persianDateString;
-        }
+        //todo
+        //public static string ConvertGregorianToPersian(DateTime dateTime)
+        //{
+        //    DateTime d = DateTime.Parse(dateTime);
+        //    PersianCalendar pc = new PersianCalendar();
+        //   var persianDateString = string.Format("{0}/{1}/{2}", pc.GetYear(d), pc.GetMonth(d), pc.GetDayOfMonth(d));
+        //    return persianDateString;
+        //}
     }
 }

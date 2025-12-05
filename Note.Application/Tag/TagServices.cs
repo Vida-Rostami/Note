@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Note.Application.Tag
 {
-    internal class TagServices : ITagServices
+    public class TagServices : ITagServices
     {
         private readonly ITagRepository _tagRepository;
 
@@ -18,7 +18,7 @@ namespace Note.Application.Tag
             _tagRepository = tagRepository;
         }
 
-        public async Task<BaseResponse<GetTagModel>> GetTag()
+        public async Task<BaseResponse<List<GetTagModel>>> GetTag()
         {
             return await _tagRepository.GetTag();
         }

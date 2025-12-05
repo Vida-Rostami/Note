@@ -19,13 +19,13 @@ namespace Note.Api.Controllers
         //add update by http method
 
         [HttpGet]
-        public async Task<BaseResponse<GetCategoryModel>> Get()
+        public async Task<BaseResponse<List<GetCategoryModel>>> Get()
         {
             return await _categoryServices.Get();
         }
 
         [HttpGet("id")]
-        public async Task<BaseResponse<GetCategoryModel>> Get([FromRoute] int catgoryId)
+        public async Task<BaseResponse<GetCategoryModel>> Get([FromQuery] int catgoryId)
         {
             return await _categoryServices.Get(catgoryId);
         }

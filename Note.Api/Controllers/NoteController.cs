@@ -7,7 +7,7 @@ namespace Note.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class NoteController 
+    public class NoteController
     {
         private readonly INoteServices _noteServices;
 
@@ -16,25 +16,31 @@ namespace Note.Api.Controllers
             _noteServices = noteServices;
         }
 
+        [HttpGet]
         public async Task<BaseResponse<GetNoteModel>> GetNote()
         {
             return await _noteServices.GetNote();
         }
 
+        [HttpGet("noteId")]
         public async Task<BaseResponse<GetNoteModel>> GetNote(int noteId)
         {
            return await _noteServices.GetNote(noteId);
         }
 
+        [HttpPost]
         public async Task<BaseResponse> InsertNote(AddNoteModel model)
         {
             return await _noteServices.InsertNote(model);
         }
 
+        [HttpPut]
         public async Task<BaseResponse> UpdateNote(UpdateNoteModel model)
         {
            return await _noteServices.UpdateNote(model);
         }
+
+        [HttpDelete]
         public async Task<BaseResponse> DeleteNote(int noteId)
         {
             return await _noteServices.DeleteNote(noteId);

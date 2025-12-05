@@ -1,14 +1,14 @@
 ﻿namespace Note.Model
 {
-    public  class BaseResponse : BaseResponse<Object>
+    public  class BaseResponse
     {
-        public int IsSuccess { get; set; }
+        public bool IsSuccess { get; set; }
         public int Code { get; set; }
         public string Message { get; set; }
 
     }
 
-    public class BaseResponse<T>
+    public class BaseResponse<T> :BaseResponse
     {
         public T Data { get; set; }
 

@@ -17,12 +17,12 @@ namespace Note.Api.Controllers
             _tagServices = tagServices;
         }
         [HttpGet]
-        public async Task<BaseResponse<GetTagModel>> GetTag()
+        public async Task<BaseResponse<List<GetTagModel>>> GetTag()
         {
             return await _tagServices.GetTag();
         }
 
-        [HttpGet]
+        [HttpGet("tagId")]
         public async Task<BaseResponse<GetTagModel>> GetTag(int tagId)
         {
             return await _tagServices.GetTag(tagId);

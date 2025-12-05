@@ -10,7 +10,7 @@ namespace Note.Application.Category
 {
     public interface ICategoryServices
     {
-        Task<BaseResponse<GetCategoryModel>> Get();
+        Task<BaseResponse<List<GetCategoryModel>>> Get();
         Task<BaseResponse<GetCategoryModel>> Get(int catgoryId);
         Task<BaseResponse> Insert(AddCategoryModel model);
         Task<BaseResponse> Update(UpdateCategoryModel model);

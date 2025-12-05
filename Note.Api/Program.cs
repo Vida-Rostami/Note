@@ -22,7 +22,7 @@ namespace Note.Api
 
             builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("ConnectionStrings"));
             builder.Services.AddScoped<INoteServices, NoteServices>();
-            builder.Services.AddScoped<ITagServices,ITagServices>();
+            builder.Services.AddScoped<ITagServices, TagServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
 
             builder.Services.AddScoped<INoteRepository, NoteRepository>();

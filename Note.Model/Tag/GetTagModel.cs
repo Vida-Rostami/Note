@@ -11,7 +11,7 @@ namespace Note.Model.Tag
     {
         public int TagId { get; set; }
         public  string TagName { get; set; }
-        public DateTime CreateDateTime { get; set; }    
-        public DateTime ModifyDateTime { get; set; }
+        public DateTime? CreateDateTime { get; set; }    
+        public DateTime? ModifyDateTime { get; set; }
     }
 }
