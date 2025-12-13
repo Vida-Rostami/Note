@@ -3,15 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteApi", "NoteApi\NoteApi.csproj", "{DE805995-3B27-43B0-93B2-7523B8D643D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Note.Api", "Note.Api\Note.Api.csproj", "{D2163450-01C2-47E5-9064-5EA53F7E2B0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Note.Api", "Note.Api\Note.Api.csproj", "{D2163450-01C2-47E5-9064-5EA53F7E2B0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Note.Infrastructure", "Note.Infrastructure\Note.Infrastructure.csproj", "{AD8E4D3C-19C4-443E-A2F5-BAAEFAD5E85C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Note.Infrastructure", "Note.Infrastructure\Note.Infrastructure.csproj", "{AD8E4D3C-19C4-443E-A2F5-BAAEFAD5E85C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Note.Model", "Note.Model\Note.Model.csproj", "{F563D8A1-76A7-4A0B-8792-0B9BE01B852E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Note.Model", "Note.Model\Note.Model.csproj", "{F563D8A1-76A7-4A0B-8792-0B9BE01B852E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Note.Application", "Note.Application\Note.Application.csproj", "{0476D97F-DF53-4E12-8EA5-DBB032E23D79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Note.Application", "Note.Application\Note.Application.csproj", "{0476D97F-DF53-4E12-8EA5-DBB032E23D79}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DatabaseBackup", "DatabaseBackup", "{50520685-B42F-486C-B559-5A86DF987418}"
+	ProjectSection(SolutionItems) = preProject
+		DatabaseBackup\notedb_backup.dmp = DatabaseBackup\notedb_backup.dmp
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +22,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DE805995-3B27-43B0-93B2-7523B8D643D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DE805995-3B27-43B0-93B2-7523B8D643D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DE805995-3B27-43B0-93B2-7523B8D643D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE805995-3B27-43B0-93B2-7523B8D643D4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D2163450-01C2-47E5-9064-5EA53F7E2B0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D2163450-01C2-47E5-9064-5EA53F7E2B0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2163450-01C2-47E5-9064-5EA53F7E2B0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
