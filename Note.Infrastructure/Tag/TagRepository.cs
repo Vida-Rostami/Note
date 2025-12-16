@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
 using Note.Model;
+using Note.Model.Note;
 using Note.Model.Tag;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
@@ -100,7 +101,15 @@ namespace Note.Infrastructure.Tag
                         TagName = reader["TagName"].ToString()
                     };
                 }
-
+                if (tag == null)
+                {
+                    return new BaseResponse<GetTagModel>
+                    {
+                        IsSuccess = false,
+                        Message = "اطلاعاتی یافت نشد",
+                        Code = 204
+                    };
+                }
                 return new BaseResponse<GetTagModel>
                 {
                     Data = tag,
@@ -156,6 +165,19 @@ namespace Note.Infrastructure.Tag
         {
             try
             {
+                var getTag = GetTag(model.TagId);
+                if (getTag != null)
+                {
+                    if (getTag.Result.Code == 204)
+                    {
+                        return new BaseResponse
+                        {
+                            IsSuccess = false,
+                            Code = 204,
+                            Message = "با شناسه وارد شده داده ای یافت نشد."
+                        };
+                    }
+                }
                 using (var connection = new OracleConnection(_option.OracleConnection))
                 {
                     await connection.OpenAsync();
@@ -186,6 +208,19 @@ namespace Note.Infrastructure.Tag
         {
             try
             {
+                var getTag = GetTag(tagId);
+                if (getTag != null)
+                {
+                    if (getTag.Result.Code == 204)
+                    {
+                        return new BaseResponse
+                        {
+                            IsSuccess = false,
+                            Code = 204,
+                            Message = "با شناسه وارد شده داده ای یافت نشد."
+                        };
+                    }
+                }
                 using (var connection = new OracleConnection(_option.OracleConnection))
                 {
                     await connection.OpenAsync();

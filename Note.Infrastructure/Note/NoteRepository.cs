@@ -216,6 +216,19 @@ namespace Note.Infrastructure.Note
         {
             try
             {
+                var getNote = GetNote(model.NoteId);
+                if (getNote != null)
+                {
+                    if (getNote.Result.Code == 204)
+                    {
+                        return new BaseResponse
+                        {
+                            IsSuccess = false,
+                            Code = 204,
+                            Message = "با شناسه وارد شده داده ای یافت نشد."
+                        };
+                    }
+                }
                 using var connection = new OracleConnection(_options.OracleConnection);
                 await connection.OpenAsync();
 
@@ -257,6 +270,19 @@ namespace Note.Infrastructure.Note
         {
             try
             {
+                var getNote = GetNote(noteId);
+                if (getNote != null)
+                {
+                    if (getNote.Result.Code == 204)
+                    {
+                        return new BaseResponse
+                        {
+                            IsSuccess = false,
+                            Code = 204,
+                            Message = "با شناسه وارد شده داده ای یافت نشد."
+                        };
+                    }
+                }
                 using var connection = new OracleConnection(_options.OracleConnection);
                 await connection.OpenAsync();
 

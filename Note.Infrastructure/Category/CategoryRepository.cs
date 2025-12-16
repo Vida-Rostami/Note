@@ -2,8 +2,10 @@
 using Microsoft.Extensions.Options;
 using Note.Model;
 using Note.Model.Category;
+using Note.Model.Note;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
+using System.Reflection;
 
 namespace Note.Infrastructure.Category
 {
@@ -87,28 +89,29 @@ namespace Note.Infrastructure.Category
                     CommandType = CommandType.StoredProcedure
                 };
 
-                // پارامتر ورودی
                 command.Parameters.Add("p_CategoryId", OracleDbType.Int32).Value = categoryId;
-
-                // پارامتر RefCursor خروجی
                 command.Parameters.Add("p_Cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
 
                 GetCategoryModel category = null;
 
-                // اجرای SP و گرفتن RefCursor
                 using var reader = await command.ExecuteReaderAsync();
 
-                // خواندن اولین ردیف
                 if (await reader.ReadAsync())
                 {
                     category = new GetCategoryModel
                     {
-                        CategoryName = reader.IsDBNull(reader.GetOrdinal("CategoryName"))
-                                       ? null
-                                       : reader.GetString(reader.GetOrdinal("CategoryName"))
+                        CategoryName = reader.IsDBNull(reader.GetOrdinal("CategoryName")) ? null : reader.GetString(reader.GetOrdinal("CategoryName"))
                     };
                 }
-
+                if (category == null)
+                {
+                    return new BaseResponse<GetCategoryModel>
+                    {
+                        IsSuccess = false,
+                        Message = "اطلاعاتی یافت نشد",
+                        Code = 204
+                    };
+                }
                 return new BaseResponse<GetCategoryModel>
                 {
                     Data = category,
@@ -125,67 +128,6 @@ namespace Note.Infrastructure.Category
                     IsSuccess = false,
                     Code = 500,
                     Message = "خطایی رخ داده است"
-                };
-            }
-        }
-
-        public async Task<BaseResponse<GetCategoryModel>> Get1(int categoryId)
-        {
-            try
-            {
-                using var connection = new OracleConnection(_options.OracleConnection);
-                await connection.OpenAsync();
-
-                using var command = new OracleCommand("SP_GetCategoryById", connection)
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-
-                // ورودی
-                command.Parameters.Add("p_CategoryId", OracleDbType.Int32).Value = categoryId;
-
-                // خروجی REF CURSOR
-                command.Parameters.Add("p_Cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
-
-                using var reader = await command.ExecuteReaderAsync();
-
-                // دپارس کردن ریدر به لیست RoomModel
-                var categoryModel = new GetCategoryModel();
-                while (await reader.ReadAsync())
-                {
-                    {
-                        categoryModel.CategoryName = reader.GetString("CategoryName"); //? (cate?)null : Enum.Parse<RoomType>(reader.GetString(reader.GetOrdinal("ROOMTYPE"))),
-                    };
-                }
-
-                //if (!roomModels.Any())
-                //{
-                //return new BaseResponse<GetCategoryModel>
-                //{
-                //    IsSuccess = true,
-                //    Message = "در هتل مورد نظر اتاقی یافت نشد",
-                //    Code = 201
-                //};
-                //  }
-
-                //  var roomDtos = _mapper.Map<IEnumerable<RoomResponseDto>>(roomModels);
-
-                return new BaseResponse<GetCategoryModel>
-                {
-                    IsSuccess = true,
-                    Data = categoryModel,
-                    Message = "اطلاعات اتاق با موفقیت دریافت گردید.",
-                    Code = 200
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<GetCategoryModel>
-                {
-
-                    IsSuccess = false,
-                    Message = $"خطا در دریافت اطلاعات: {ex.Message}",
-                    Code = 500
                 };
             }
         }
@@ -223,6 +165,19 @@ namespace Note.Infrastructure.Category
         {
             try
             {
+                var getCategory = Get(model.CategoryId);
+                if (getCategory != null)
+                {
+                    if (getCategory.Result.Code == 204)
+                    {
+                        return new BaseResponse
+                        {
+                            IsSuccess = false,
+                            Code = 204,
+                            Message = "با شناسه وارد شده داده ای یافت نشد."
+                        };
+                    }
+                }
                 using (var connection = new OracleConnection(_options.OracleConnection))
                 {
                     await connection.OpenAsync();
@@ -253,6 +208,19 @@ namespace Note.Infrastructure.Category
         {
             try
             {
+                var getCategory = Get(categoryId);
+                if (getCategory != null)
+                {
+                    if (getCategory.Result.Code == 204)
+                    {
+                        return new BaseResponse
+                        {
+                            IsSuccess = false,
+                            Code = 204,
+                            Message = "با شناسه وارد شده داده ای یافت نشد."
+                        };
+                    }
+                }
                 using (var connection = new OracleConnection(_options.OracleConnection))
                 {
                     await connection.OpenAsync();
