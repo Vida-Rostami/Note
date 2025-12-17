@@ -1,4 +1,5 @@
 
+using Note.Api.Middleware;
 using Note.Application.Category;
 using Note.Application.Note;
 using Note.Application.Tag;
@@ -38,6 +39,15 @@ namespace Note.Api
                 app.UseSwaggerUI();
             }
 
+            //app.UseExceptionHandler(appBuilder =>
+            //{
+            //    appBuilder.Run(async context =>
+            //    {
+            //        context.Response.StatusCode = 500;
+            //        await context.Response.WriteAsync("Internal Server Error");
+            //    });
+            //});
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseHttpsRedirection();
             app.UseAuthorization();
 
