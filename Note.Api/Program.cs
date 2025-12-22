@@ -47,6 +47,7 @@ namespace Note.Api
             //        await context.Response.WriteAsync("Internal Server Error");
             //    });
             //});
+            app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<ExceptionMiddleware>();
             app.UseStatusCodePages(async context =>
             {
