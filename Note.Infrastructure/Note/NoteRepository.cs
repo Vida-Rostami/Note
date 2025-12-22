@@ -89,12 +89,13 @@ namespace Note.Infrastructure.Note
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<GetNoteModel>>
-                {
-                    IsSuccess = false,
-                    Message = "خطا در دریافت اطلاعات",
-                    Code = 500
-                };
+                //return new BaseResponse<List<GetNoteModel>>
+                //{
+                //    IsSuccess = false,
+                //    Message = "خطا در دریافت اطلاعات",
+                //    Code = 500
+                //};
+                throw;
             }
         }
 
@@ -163,12 +164,13 @@ namespace Note.Infrastructure.Note
             }
             catch (Exception ex)
             {
-                return new BaseResponse<GetNoteModel>
-                {
-                    IsSuccess = false,
-                    Message = $"خطا در دریافت اطلاعات",
-                    Code = 500
-                };
+                //return new BaseResponse<GetNoteModel>
+                //{
+                //    IsSuccess = false,
+                //    Message = $"خطا در دریافت اطلاعات",
+                //    Code = 500
+                //};
+                throw;
             }
         }
 
@@ -203,12 +205,13 @@ namespace Note.Infrastructure.Note
             }
             catch (Exception ex)
             {
-                return new BaseResponse
-                {
-                    IsSuccess = false,
-                    Message = $"خطا در ثبت ",
-                    Code = 500
-                };
+                //return new BaseResponse
+                //{
+                //    IsSuccess = false,
+                //    Message = $"خطا در ثبت ",
+                //    Code = 500
+                //};
+                throw;
             }
         }
 
@@ -256,12 +259,13 @@ namespace Note.Infrastructure.Note
             }
             catch (Exception ex)
             {
-                return new BaseResponse
-                {
-                    IsSuccess = false,
-                    Message = $"خطا در بروزرسانی نوت",
-                    Code = 500
-                };
+                //return new BaseResponse
+                //{
+                //    IsSuccess = false,
+                //    Message = $"خطا در بروزرسانی نوت",
+                //    Code = 500
+                //};
+                throw;
             }
         }
 
@@ -304,12 +308,13 @@ namespace Note.Infrastructure.Note
             }
             catch (Exception ex)
             {
-                return new BaseResponse
-                {
-                    IsSuccess = false,
-                    Message = $"خطا در حذف نوت",
-                    Code = 500
-                };
+                //return new BaseResponse
+                //{
+                //    IsSuccess = false,
+                //    Message = $"خطا در حذف نوت",
+                //    Code = 500
+                //};
+                throw;
             }
         }
     }

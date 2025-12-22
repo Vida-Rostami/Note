@@ -2,10 +2,8 @@
 using Microsoft.Extensions.Options;
 using Note.Model;
 using Note.Model.Category;
-using Note.Model.Note;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
-using System.Reflection;
 
 namespace Note.Infrastructure.Category
 {
@@ -69,12 +67,13 @@ namespace Note.Infrastructure.Category
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<GetCategoryModel>>
-                {
-                    IsSuccess = false,
-                    Message = $"خطا در دریافت اطلاعات",
-                    Code = 500
-                };
+                throw;
+                //return new BaseResponse<List<GetCategoryModel>>
+                //{
+                //    IsSuccess = false,
+                //    Message = $"خطا در دریافت اطلاعات",
+                //    Code = 500
+                //};
             }
         }
         public async Task<BaseResponse<GetCategoryModel>> Get(int categoryId)
@@ -123,12 +122,13 @@ namespace Note.Infrastructure.Category
             catch (Exception ex)
             {
                 // TODO: log ex.Message
-                return new BaseResponse<GetCategoryModel>
-                {
-                    IsSuccess = false,
-                    Code = 500,
-                    Message = "خطایی رخ داده است"
-                };
+                //return new BaseResponse<GetCategoryModel>
+                //{
+                //    IsSuccess = false,
+                //    Code = 500,
+                //    Message = "خطایی رخ داده است"
+                //};
+                throw;
             }
         }
         public async Task<BaseResponse> Insert(AddCategoryModel model)
@@ -152,14 +152,15 @@ namespace Note.Infrastructure.Category
             catch (Exception ex)
             {
                 //log
-                return new BaseResponse
-                {
-                    IsSuccess = false,
-                    Code = 500,
-                    Message = "خطایی رخ داده است"
-                };
+                //    return new BaseResponse
+                //    {
+                //        IsSuccess = false,
+                //        Code = 500,
+                //        Message = "خطایی رخ داده است"
+                //    };
+                //}
+                throw;
             }
-        }
 
         public async Task<BaseResponse> Update(UpdateCategoryModel model)
         {
@@ -196,12 +197,13 @@ namespace Note.Infrastructure.Category
             catch (Exception ex)
             {
                 //log
-                return new BaseResponse
-                {
-                    IsSuccess = false,
-                    Code = 500,
-                    Message = "خطایی رخ داده است"
-                };
+                //return new BaseResponse
+                //{
+                //    IsSuccess = false,
+                //    Code = 500,
+                //    Message = "خطایی رخ داده است"
+                //};
+                throw;
             }
         }
         public async Task<BaseResponse> Delete(int categoryId)
@@ -238,12 +240,13 @@ namespace Note.Infrastructure.Category
             catch (Exception ex)
             {
                 //log
-                return new BaseResponse
-                {
-                    IsSuccess = false,
-                    Code = 500,
-                    Message = "خطایی رخ داده است"
-                };
+                //return new BaseResponse
+                //{
+                //    IsSuccess = false,
+                //    Code = 500,
+                //    Message = "خطایی رخ داده است"
+                //};
+                throw;
             }
         }
     }

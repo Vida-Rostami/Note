@@ -48,6 +48,18 @@ namespace Note.Api
             //    });
             //});
             app.UseMiddleware<ExceptionMiddleware>();
+            app.UseStatusCodePages(async context =>
+            {
+                var response = context.HttpContext.Response;
+                if (response.StatusCode == StatusCodes.Status404NotFound)
+                {
+                    response.ContentType = "application/json";
+                    await response.WriteAsJsonAsync(new
+                    {
+                        message = ErrorMessages.NotFound
+                    });
+                }
+            });
             app.UseHttpsRedirection();
             app.UseAuthorization();
 
