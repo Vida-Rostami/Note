@@ -8,6 +8,7 @@ using Note.Infrastructure.Log.ExceptionLoggerService;
 using Note.Infrastructure.Note;
 using Note.Infrastructure.Tag;
 using Note.Domain;
+using Note.Infrastructure.Log.AppLogger;
 
 namespace Note.Api
 {
@@ -30,7 +31,8 @@ namespace Note.Api
             builder.Services.AddScoped<INoteRepository, NoteRepository>();
             builder.Services.AddScoped<ITagRepository, TagRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-            builder.Services.AddSingleton<IExceptionLogger, ExceptionLogger>();
+            builder.Services.AddScoped<IExceptionLogger, ExceptionLogger>();
+            builder.Services.AddScoped<IAppLogger, AppLogger>();
 
             var app = builder.Build();
 
@@ -50,6 +52,7 @@ namespace Note.Api
             //    });
             //});
             app.UseMiddleware<CorrelationIdMiddleware>();
+            app.UseMiddleware<RequestResponseLoggingMiddleware>();
             app.UseMiddleware<ExceptionMiddleware>();
             app.UseStatusCodePages(async context =>
             {

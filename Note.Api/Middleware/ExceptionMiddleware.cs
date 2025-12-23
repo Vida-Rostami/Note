@@ -9,15 +9,13 @@ namespace Note.Api.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionMiddleware> _logger;
-        private readonly IExceptionLogger _dbLogger;
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IExceptionLogger dbLogger)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
             _next = next;
             _logger = logger;
-            _dbLogger = dbLogger;
         }
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, IExceptionLogger dbLogger)
         {
             try
             {
@@ -26,7 +24,7 @@ namespace Note.Api.Middleware
             catch (Exception ex)
             {
                 var traceId = context.TraceIdentifier;
-                await _dbLogger.LogException(new ExceptionLog
+                await dbLogger.LogException(new ExceptionLog
                 {
                     Action = context.Request.Path,
                     ExceptionMessage = ex.Message,
