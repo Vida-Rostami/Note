@@ -2,6 +2,7 @@
 using Note.Application.Category;
 using Note.Model;
 using Note.Model.Category;
+using System.ComponentModel.DataAnnotations;
 
 namespace Note.Api.Controllers
 {
@@ -13,6 +14,8 @@ namespace Note.Api.Controllers
 
         public CategoryController(ICategoryServices categoryServices)
         {
+            throw new ValidationException("TagName is required");
+
             _categoryServices = categoryServices;
         }
 

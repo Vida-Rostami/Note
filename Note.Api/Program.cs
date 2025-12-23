@@ -4,6 +4,7 @@ using Note.Application.Category;
 using Note.Application.Note;
 using Note.Application.Tag;
 using Note.Infrastructure.Category;
+using Note.Infrastructure.Log.ExceptionLoggerService;
 using Note.Infrastructure.Note;
 using Note.Infrastructure.Tag;
 using Note.Model;
@@ -29,6 +30,7 @@ namespace Note.Api
             builder.Services.AddScoped<INoteRepository, NoteRepository>();
             builder.Services.AddScoped<ITagRepository, TagRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            //builder.Services.AddScoped<IExceptionLoggerService, ExceptionLoggerService>();
 
             var app = builder.Build();
 
