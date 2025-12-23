@@ -214,9 +214,41 @@ namespace Note.Infrastructure.Category
                 };
             });
         }
+        //public async Task<BaseResponse> Insert(AddCategoryModel model)
+        //{
+        //    return await PollyHelper.ExecuteWithRetryAsync(async () => {
+        //        try
+        //        {
+        //            using (var connection = new OracleConnection(_options.OracleConnection))
+        //            {
+        //                await connection.OpenAsync();
+        //                var parameters = new DynamicParameters();
+        //                parameters.Add("P_CategoryName", model.CategoryName, DbType.String, ParameterDirection.Input);
+        //                await connection.ExecuteAsync("SP_InsertCategory", parameters, commandType: CommandType.StoredProcedure);
+        //                return new BaseResponse
+        //                {
+        //                    IsSuccess = true,
+        //                    Code = 201,
+        //                    Message = "با موفقیت درج شد",
+        //                };
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            //log
+        //            //    return new BaseResponse
+        //            //    {
+        //            //        IsSuccess = false,
+        //            //        Code = 500,
+        //            //        Message = "خطایی رخ داده است"
+        //            //    };
+        //            //}
+        //            throw;
+        //        }
+        //    }
         public async Task<BaseResponse> Insert(AddCategoryModel model)
         {
-            try
+            return await PollyHelper.ExecuteWithRetryAsync(async () =>
             {
                 using (var connection = new OracleConnection(_options.OracleConnection))
                 {
@@ -231,24 +263,56 @@ namespace Note.Infrastructure.Category
                         Message = "با موفقیت درج شد",
                     };
                 }
-            }
-            catch (Exception ex)
-            {
-                //log
-                //    return new BaseResponse
-                //    {
-                //        IsSuccess = false,
-                //        Code = 500,
-                //        Message = "خطایی رخ داده است"
-                //    };
-                //}
-                throw;
-            }
+            });
         }
+        //public async Task<BaseResponse> Update(UpdateCategoryModel model)
+        //{
+        //    try
+        //    {
+        //        var getCategory = Get(model.CategoryId);
+        //        if (getCategory != null)
+        //        {
+        //            if (getCategory.Result.Code == 204)
+        //            {
+        //                return new BaseResponse
+        //                {
+        //                    IsSuccess = false,
+        //                    Code = 204,
+        //                    Message = "با شناسه وارد شده داده ای یافت نشد."
+        //                };
+        //            }
+        //        }
+        //        using (var connection = new OracleConnection(_options.OracleConnection))
+        //        {
+        //            await connection.OpenAsync();
+        //            var parameters = new DynamicParameters();
+        //            parameters.Add("P_CategoryId", model.CategoryId, DbType.Int32, ParameterDirection.Input);
+        //            parameters.Add("P_CategoryName", model.CategoryName, DbType.String, ParameterDirection.Input);
+        //            await connection.ExecuteAsync("SP_UpdateCategory", parameters, commandType: CommandType.StoredProcedure);
+        //            return new BaseResponse
+        //            {
+        //                IsSuccess = true,
+        //                Code = 201,
+        //                Message = "با موفقیت اپدیت شد",
+        //            };
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //log
+        //        //return new BaseResponse
+        //        //{
+        //        //    IsSuccess = false,
+        //        //    Code = 500,
+        //        //    Message = "خطایی رخ داده است"
+        //        //};
+        //        throw;
+        //    }
+        //}
 
         public async Task<BaseResponse> Update(UpdateCategoryModel model)
         {
-            try
+            return await PollyHelper.ExecuteWithRetryAsync(async () =>
             {
                 var getCategory = Get(model.CategoryId);
                 if (getCategory != null)
@@ -277,22 +341,56 @@ namespace Note.Infrastructure.Category
                         Message = "با موفقیت اپدیت شد",
                     };
                 }
-            }
-            catch (Exception ex)
-            {
-                //log
-                //return new BaseResponse
-                //{
-                //    IsSuccess = false,
-                //    Code = 500,
-                //    Message = "خطایی رخ داده است"
-                //};
-                throw;
-            }
+            });
         }
+
+        //public async Task<BaseResponse> Delete(int categoryId)
+        //{
+        //    try
+        //    {
+        //        var getCategory = Get(categoryId);
+        //        if (getCategory != null)
+        //        {
+        //            if (getCategory.Result.Code == 204)
+        //            {
+        //                return new BaseResponse
+        //                {
+        //                    IsSuccess = false,
+        //                    Code = 204,
+        //                    Message = "با شناسه وارد شده داده ای یافت نشد."
+        //                };
+        //            }
+        //        }
+        //        using (var connection = new OracleConnection(_options.OracleConnection))
+        //        {
+        //            await connection.OpenAsync();
+        //            var parameters = new DynamicParameters();
+        //            parameters.Add("P_CategoryId", categoryId, DbType.Int32, ParameterDirection.Input);
+        //            await connection.ExecuteAsync("SP_DeleteCategory", parameters, commandType: CommandType.StoredProcedure);
+        //            return new BaseResponse
+        //            {
+        //                IsSuccess = true,
+        //                Code = 201,
+        //                Message = "با موفقیت حدف شد",
+        //            };
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //log
+        //        //return new BaseResponse
+        //        //{
+        //        //    IsSuccess = false,
+        //        //    Code = 500,
+        //        //    Message = "خطایی رخ داده است"
+        //        //};
+        //        throw;
+        //    }
+        //}
+
         public async Task<BaseResponse> Delete(int categoryId)
         {
-            try
+            return await PollyHelper.ExecuteWithRetryAsync(async () =>
             {
                 var getCategory = Get(categoryId);
                 if (getCategory != null)
@@ -317,21 +415,10 @@ namespace Note.Infrastructure.Category
                     {
                         IsSuccess = true,
                         Code = 201,
-                        Message = "با موفقیت حدف شد",
+                        Message = "با موفقیت حذف شد",
                     };
                 }
-            }
-            catch (Exception ex)
-            {
-                //log
-                //return new BaseResponse
-                //{
-                //    IsSuccess = false,
-                //    Code = 500,
-                //    Message = "خطایی رخ داده است"
-                //};
-                throw;
-            }
+            });
         }
     }
 }
