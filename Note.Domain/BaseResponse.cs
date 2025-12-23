@@ -1,4 +1,4 @@
-﻿namespace Note.Model
+﻿namespace Note.Domain
 {
     public  class BaseResponse
     {

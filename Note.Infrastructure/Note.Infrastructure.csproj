@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Note.Model\Note.Model.csproj" />
+    <ProjectReference Include="..\Note.Domain\Note.Domain.csproj" />
   </ItemGroup>
 
 </Project>

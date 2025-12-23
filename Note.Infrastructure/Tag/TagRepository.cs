@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
-using Note.Model;
-using Note.Model.Tag;
+using Note.Domain;
+using Note.Domain.Tag;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using System.Text;

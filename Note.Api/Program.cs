@@ -6,7 +6,7 @@ using Note.Application.Tag;
 using Note.Infrastructure.Category;
 using Note.Infrastructure.Note;
 using Note.Infrastructure.Tag;
-using Note.Model;
+using Note.Domain;
 
 namespace Note.Api
 {

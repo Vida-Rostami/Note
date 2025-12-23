@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Note.Application.Category;
-using Note.Model;
-using Note.Model.Category;
+using Note.Domain;
+using Note.Domain.Category;
 
 namespace Note.Api.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("api/v1/[controller]/[action]")]
+     [ApiController]
     public class CategoryController
     {
         private readonly ICategoryServices _categoryServices;

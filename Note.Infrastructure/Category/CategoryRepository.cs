@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
 using Note.Infrastructure.Common;
-using Note.Model;
-using Note.Model.Category;
+using Note.Domain;
+using Note.Domain.Category;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
 

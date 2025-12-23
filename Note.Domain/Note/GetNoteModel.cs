@@ -1,6 +1,6 @@
-﻿using Note.Model.Common;
+﻿using Note.Domain.Common;
 
-namespace Note.Model.Note
+namespace Note.Domain.Note
 {
     public class GetNoteModel
     {

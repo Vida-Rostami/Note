@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
-using Note.Model;
-using Note.Model.Note;
+using Note.Domain;
+using Note.Domain.Note;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
 

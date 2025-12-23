@@ -1,4 +1,4 @@
-﻿namespace Note.Model.Note
+﻿namespace Note.Domain.Note
 {
     public class AddNoteModel
     {

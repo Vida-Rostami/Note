@@ -1,4 +1,4 @@
-﻿using Note.Model;
+﻿using Note.Domain;
 using System.ComponentModel.DataAnnotations;
 
 namespace Note.Api.Middleware

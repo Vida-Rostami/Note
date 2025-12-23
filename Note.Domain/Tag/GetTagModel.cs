@@ -1,6 +1,6 @@
-﻿using Note.Model.Common;
+﻿using Note.Domain.Common;
 
-namespace Note.Model.Tag
+namespace Note.Domain.Tag
 {
     public class GetTagModel
     {

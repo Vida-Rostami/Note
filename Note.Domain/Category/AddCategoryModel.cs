@@ -1,4 +1,4 @@
-﻿namespace Note.Model.Category
+﻿namespace Note.Domain.Category
 {
     public class AddCategoryModel
     {

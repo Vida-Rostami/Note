@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Note.Model.Common
+namespace Note.Domain.Common
 {
     public static class ConvertDate
     {

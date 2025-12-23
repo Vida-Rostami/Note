@@ -1,6 +1,6 @@
-﻿using Note.Model.Common;
+﻿using Note.Domain.Common;
 
-namespace Note.Model.Category
+namespace Note.Domain.Category
 {
     public class GetCategoryModel
     {
