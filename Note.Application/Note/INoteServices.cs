@@ -1,10 +1,5 @@
-﻿using Note.Model.Note;
-using Note.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Note.Domain;
+using Note.Domain.Note;
 
 namespace Note.Application.Note
 {

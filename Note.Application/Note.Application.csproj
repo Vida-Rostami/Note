@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Note.Infrastructure\Note.Infrastructure.csproj" />
-    <ProjectReference Include="..\Note.Model\Note.Model.csproj" />
+    <ProjectReference Include="..\Note.Domain\Note.Domain.csproj" />
   </ItemGroup>
 
 </Project>

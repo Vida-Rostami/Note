@@ -1,11 +1,6 @@
 ﻿using Note.Infrastructure.Category;
-using Note.Model;
-using Note.Model.Category;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Note.Domain;
+using Note.Domain.Category;
 
 namespace Note.Application.Category
 {

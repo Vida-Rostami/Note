@@ -1,4 +1,4 @@
-﻿using Note.Infrastructure.Log.ExceptionLoggerService;
+﻿using Note.Domain;
 using System.ComponentModel.DataAnnotations;
 
 namespace Note.Api.Middleware
@@ -23,36 +23,26 @@ namespace Note.Api.Middleware
             }
             catch (Exception ex)
             {
-                var statusCode = ex switch
+                var (statusCode, message) = ex switch
                 {
-                    KeyNotFoundException => StatusCodes.Status404NotFound,
-                    ValidationException => StatusCodes.Status400BadRequest,
-                    _ => StatusCodes.Status500InternalServerError
+                    KeyNotFoundException => (StatusCodes.Status404NotFound, ErrorMessages.NotFound),
+                    ValidationException => (StatusCodes.Status400BadRequest, ErrorMessages.BadRequest),
+                    _ => (StatusCodes.Status500InternalServerError , ErrorMessages.InternalServerError)
                 };
-
-                _logger.LogError(ex, "Exception occured : Path: {Path}, Method: {Method} ", context.Request.Path, context.Request.Method);
-
-                //string requestBody = null;
-                //if (context.Request.ContentLength > 0)
+                //switch (ex)
                 //{
-                //    context.Request.EnableBuffering();
-                //    using var reader = new StreamReader(context.Request.Body, leaveOpen: true);
-                //    requestBody = await reader.ReadToEndAsync();
-                //    context.Request.Body.Position = 0;
+                //    case KeyNotFoundException: context.Response.StatusCode = 404; break;
+                //    case ValidationException: context.Response.StatusCode = 400; break;
+                //    default: context.Response.StatusCode = 500; break;
                 //}
-                //await _dbLogger.LogExceptionAsync(
-                //    action: $"{context.Request.Method} {context.Request.Path}",
-                //    exceptionMessage: ex.Message,
-                //    stackTrace: ex.StackTrace,
-                //    innerException: ex.InnerException?.ToString(),
-                //    request: requestBody,
-                //    userId: context.User.Identity.IsAuthenticated ? int.Parse(context.User.FindFirst("id")?.Value ?? "0") : null
-                //);
-
-                context.Response.StatusCode = statusCode;
-                context.Response.ContentType = "application/json";
-                var response = new { message = ex.Message };
-                await context.Response.WriteAsJsonAsync(response);
+               context.Response.StatusCode = statusCode;
+                context.Response.ContentType  = "application/json";
+                //var response = new { message = ex.Message };
+                //await context.Response.WriteAsJsonAsync(response);
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    message
+                });
             }
         }
     }

@@ -1,6 +1,6 @@
 ﻿using Note.Infrastructure.Note;
-using Note.Model;
-using Note.Model.Note;
+using Note.Domain;
+using Note.Domain.Note;
 
 namespace Note.Application.Note
 {

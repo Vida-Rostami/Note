@@ -1,5 +1,5 @@
-﻿using Note.Model;
-using Note.Model.Tag;
+﻿using Note.Domain;
+using Note.Domain.Tag;
 
 namespace Note.Infrastructure.Tag
 {

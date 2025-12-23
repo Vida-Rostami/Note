@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 
-namespace Note.Model.Common
+namespace Note.Domain.Common
 {
-    public class ConvertDate
+    public static class ConvertDate
     {
         public static DateTime? ConvertPersianToGregorian(string? persianDate)
         {
@@ -37,5 +32,15 @@ namespace Note.Model.Common
         //   var persianDateString = string.Format("{0}/{1}/{2}", pc.GetYear(d), pc.GetMonth(d), pc.GetDayOfMonth(d));
         //    return persianDateString;
         //}
+        public static string ToShamsi(this DateTime? dateTime)
+        {
+            if (dateTime == null)
+                return string.Empty;
+
+            var pc = new PersianCalendar();
+            var d = dateTime.Value;
+
+            return $"{pc.GetYear(d):0000}/{pc.GetMonth(d):00}/{pc.GetDayOfMonth(d):00}";
+        }
     }
 }

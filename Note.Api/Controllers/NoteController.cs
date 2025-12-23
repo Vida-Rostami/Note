@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Note.Application.Note;
-using Note.Model;
-using Note.Model.Note;
+using Note.Domain;
+using Note.Domain.Note;
 
 namespace Note.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/[controller]/[action]")]
     public class NoteController
     {
         private readonly INoteServices _noteServices;

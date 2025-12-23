@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Note.Application.Tag;
-using Note.Model;
-using Note.Model.Tag;
+using Note.Domain;
+using Note.Domain.Tag;
 
 namespace Note.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]/[action]")]
     [ApiController]
     public class TagController
     {

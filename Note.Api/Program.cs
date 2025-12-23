@@ -7,7 +7,7 @@ using Note.Infrastructure.Category;
 using Note.Infrastructure.Log.ExceptionLoggerService;
 using Note.Infrastructure.Note;
 using Note.Infrastructure.Tag;
-using Note.Model;
+using Note.Domain;
 
 namespace Note.Api
 {
@@ -49,7 +49,20 @@ namespace Note.Api
             //        await context.Response.WriteAsync("Internal Server Error");
             //    });
             //});
+            app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<ExceptionMiddleware>();
+            app.UseStatusCodePages(async context =>
+            {
+                var response = context.HttpContext.Response;
+                if (response.StatusCode == StatusCodes.Status404NotFound)
+                {
+                    response.ContentType = "application/json";
+                    await response.WriteAsJsonAsync(new
+                    {
+                        message = ErrorMessages.NotFound
+                    });
+                }
+            });
             app.UseHttpsRedirection();
             app.UseAuthorization();
 

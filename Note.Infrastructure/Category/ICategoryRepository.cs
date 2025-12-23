@@ -1,5 +1,5 @@
-﻿using Note.Model;
-using Note.Model.Category;
+﻿using Note.Domain;
+using Note.Domain.Category;
 
 namespace Note.Infrastructure.Category
 {

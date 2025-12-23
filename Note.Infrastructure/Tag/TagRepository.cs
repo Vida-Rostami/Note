@@ -1,8 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
-using Note.Model;
-using Note.Model.Note;
-using Note.Model.Tag;
+using Note.Domain;
+using Note.Domain.Tag;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using System.Text;
@@ -67,12 +66,13 @@ namespace Note.Infrastructure.Tag
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<GetTagModel>>
-                {
-                    IsSuccess = false,
-                    Message = $"خطا در دریافت اطلاعات",
-                    Code = 500
-                };
+                //return new BaseResponse<List<GetTagModel>>
+                //{
+                //    IsSuccess = false,
+                //    Message = $"خطا در دریافت اطلاعات",
+                //    Code = 500
+                //};
+                throw;
             }
         }
 
@@ -121,12 +121,13 @@ namespace Note.Infrastructure.Tag
             catch (Exception ex)
             {
                 // TODO: log ex.Message
-                return new BaseResponse<GetTagModel>
-                {
-                    IsSuccess = false,
-                    Code = 500,
-                    Message = "خطایی رخ داده است"
-                };
+                //return new BaseResponse<GetTagModel>
+                //{
+                //    IsSuccess = false,
+                //    Code = 500,
+                //    Message = "خطایی رخ داده است"
+                //};
+                throw;
             }
         }
 
@@ -151,12 +152,13 @@ namespace Note.Infrastructure.Tag
             catch (Exception ex)
             {
                 //log
-                return new BaseResponse
-                {
-                    IsSuccess = false,
-                    Code = 500,
-                    Message = "خطایی رخ داده است"
-                };
+                //return new BaseResponse
+                //{
+                //    IsSuccess = false,
+                //    Code = 500,
+                //    Message = "خطایی رخ داده است"
+                //};
+                throw;
             }
 
         }
@@ -196,12 +198,13 @@ namespace Note.Infrastructure.Tag
             catch (Exception ex)
             {
                 //log
-                return new BaseResponse
-                {
-                    IsSuccess = false,
-                    Code = 500,
-                    Message = "خطایی رخ داده است"
-                };
+                //return new BaseResponse
+                //{
+                //    IsSuccess = false,
+                //    Code = 500,
+                //    Message = "خطایی رخ داده است"
+                //};
+                throw;
             }
         }
         public async Task<BaseResponse> DeleteTag(int tagId)
@@ -238,12 +241,13 @@ namespace Note.Infrastructure.Tag
             catch (Exception ex)
             {
                 //log
-                return new BaseResponse
-                {
-                    IsSuccess = false,
-                    Code = 500,
-                    Message = "خطایی رخ داده است"
-                };
+                //return new BaseResponse
+                //{
+                //    IsSuccess = false,
+                //    Code = 500,
+                //    Message = "خطایی رخ داده است"
+                //};
+                throw;
             }
         }
     }

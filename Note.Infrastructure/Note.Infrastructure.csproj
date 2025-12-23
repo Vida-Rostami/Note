@@ -10,10 +10,11 @@
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="23.26.0" />
+    <PackageReference Include="Polly" Version="8.6.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Note.Model\Note.Model.csproj" />
+    <ProjectReference Include="..\Note.Domain\Note.Domain.csproj" />
   </ItemGroup>
 
 </Project>
