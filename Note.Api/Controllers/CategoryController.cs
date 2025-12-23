@@ -13,8 +13,6 @@ namespace Note.Api.Controllers
 
         public CategoryController(ICategoryServices categoryServices)
         {
-            throw new ValidationException("TagName is required");
-
             _categoryServices = categoryServices;
         }
 

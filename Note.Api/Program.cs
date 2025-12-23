@@ -30,7 +30,7 @@ namespace Note.Api
             builder.Services.AddScoped<INoteRepository, NoteRepository>();
             builder.Services.AddScoped<ITagRepository, TagRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-            //builder.Services.AddScoped<IExceptionLoggerService, ExceptionLoggerService>();
+            builder.Services.AddSingleton<IExceptionLogger, ExceptionLogger>();
 
             var app = builder.Build();
 
@@ -73,3 +73,4 @@ namespace Note.Api
         }
     }
 }
+    

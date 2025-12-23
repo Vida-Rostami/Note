@@ -1,4 +1,6 @@
 ﻿using Note.Domain;
+using Note.Domain.Log;
+using Note.Infrastructure.Log.ExceptionLoggerService;
 using System.ComponentModel.DataAnnotations;
 
 namespace Note.Api.Middleware
@@ -7,9 +9,9 @@ namespace Note.Api.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionMiddleware> _logger;
-        private readonly IExceptionLoggerService _dbLogger;
+        private readonly IExceptionLogger _dbLogger;
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IExceptionLoggerService dbLogger)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IExceptionLogger dbLogger)
         {
             _next = next;
             _logger = logger;
@@ -23,6 +25,17 @@ namespace Note.Api.Middleware
             }
             catch (Exception ex)
             {
+                var traceId = context.TraceIdentifier;
+                await _dbLogger.LogException(new ExceptionLog
+                {
+                    Action = context.Request.Path,
+                    ExceptionMessage = ex.Message,
+                    StackTrace = ex.StackTrace,
+                    InnerException = ex.InnerException?.Message,
+                    Request = context.Request.Method,
+                    UserId = null,
+                    TraceId = traceId
+                });
                 var (statusCode, message) = ex switch
                 {
                     KeyNotFoundException => (StatusCodes.Status404NotFound, ErrorMessages.NotFound),
