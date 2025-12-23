@@ -1,10 +1,4 @@
-﻿using Note.Model.Tag;
-using Note.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Note.Model;
 using Note.Model.Note;
 
 namespace Note.Infrastructure.Note

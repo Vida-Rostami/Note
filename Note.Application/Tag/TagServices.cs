@@ -1,11 +1,6 @@
 ﻿using Note.Infrastructure.Tag;
 using Note.Model;
 using Note.Model.Tag;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Note.Application.Tag
 {
@@ -30,7 +25,7 @@ namespace Note.Application.Tag
 
         public async Task<BaseResponse> InsertTag(AddTagModel model)
         {
-            return await _tagRepository.InsertTag(model);   
+            return await _tagRepository.InsertTag(model);
         }
 
         public async Task<BaseResponse> UpdateTag(UpdateTagModel model)
