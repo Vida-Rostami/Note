@@ -9,6 +9,7 @@ using Note.Infrastructure.Note;
 using Note.Infrastructure.Tag;
 using Note.Domain;
 using Note.Infrastructure.Log.AppLogger;
+using Note.Infrastructure.Caching;
 
 namespace Note.Api
 {
@@ -32,8 +33,15 @@ namespace Note.Api
             builder.Services.AddScoped<ITagRepository, TagRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<IExceptionLogger, ExceptionLogger>();
-            builder.Services.AddScoped<IAppLogger, AppLogger>();
 
+            builder.Services.AddScoped<IAppLogger, AppLogger>();
+            builder.Services.AddScoped<ICacheService, RedisCacheService>();
+
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration.GetSection("Redis:ConnectionString").Value;
+                options.InstanceName = "NoteApp";
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
