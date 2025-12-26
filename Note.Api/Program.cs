@@ -10,6 +10,7 @@ using Note.Infrastructure.Tag;
 using Note.Domain;
 using Note.Infrastructure.Log.AppLogger;
 using Note.Infrastructure.Caching;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Note.Api
 {
@@ -42,6 +43,20 @@ namespace Note.Api
                 options.Configuration = builder.Configuration.GetSection("Redis:ConnectionString").Value;
                 options.InstanceName = "NoteApp";
             });
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.AddFixedWindowLimiter("fixed", limiterOptions =>
+                {
+                    limiterOptions.Window = TimeSpan.FromMinutes(1);
+                    limiterOptions.PermitLimit = 1000;
+                });
+            });
+            var redisConnectionString = builder.Configuration.GetValue<string>("Redis:ConnectionString");
+            var oracleConnection = builder.Configuration.GetConnectionString("OracleConnection");
+            builder.Services.AddHealthChecks()
+                .AddRedis(redisConnectionString)
+                .AddOracle(oracleConnection);
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -59,6 +74,7 @@ namespace Note.Api
             //        await context.Response.WriteAsync("Internal Server Error");
             //    });
             //});
+            app.UseRateLimiter();
             app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<RequestResponseLoggingMiddleware>();
             app.UseMiddleware<ExceptionMiddleware>();
@@ -80,6 +96,7 @@ namespace Note.Api
 
             app.MapControllers();
 
+            app.MapHealthChecks("/health");
             app.Run();
         }
     }

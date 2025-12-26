@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Note.Application.Category;
 using Note.Domain;
 using Note.Domain.Category;
 
 namespace Note.Api.Controllers
 {
+    [EnableRateLimiting("fixed")]
     [Route("api/v1/[controller]/[action]")]
      [ApiController]
     public class CategoryController
