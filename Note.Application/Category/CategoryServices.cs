@@ -79,16 +79,19 @@ namespace Note.Application.Category
 
         public async Task<BaseResponse> Insert(AddCategoryModel model)
         {
+            await _cacheService.Remove("category_all");
             return await _categoryRepository.Insert(model);
         }
 
         public async Task<BaseResponse> Update(UpdateCategoryModel model)
         {
+            await _cacheService.Remove("category_all");
             return await _categoryRepository.Update(model);
         }
 
         public async Task<BaseResponse> Delete(int categoryId)
         {
+            await _cacheService.Remove("category_all");
             return await _categoryRepository.Delete(categoryId);
         }
     }
