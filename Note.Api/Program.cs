@@ -1,4 +1,4 @@
-
+﻿
 using Note.Api.Middleware;
 using Note.Application.Category;
 using Note.Application.Note;
@@ -11,6 +11,7 @@ using Note.Domain;
 using Note.Infrastructure.Log.AppLogger;
 using Note.Infrastructure.Caching;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Net.Mime;
 
 namespace Note.Api
 {
@@ -45,12 +46,26 @@ namespace Note.Api
             });
             builder.Services.AddRateLimiter(options =>
             {
-                options.AddFixedWindowLimiter("fixed", limiterOptions =>
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                options.AddTokenBucketLimiter("token", limiterOptions =>
                 {
-                    limiterOptions.Window = TimeSpan.FromMinutes(1);
-                    limiterOptions.PermitLimit = 1000;
+                    limiterOptions.TokenLimit = 1;
+                    limiterOptions.TokensPerPeriod = 1;
+                    limiterOptions.ReplenishmentPeriod = TimeSpan.FromMinutes(1);
+                    limiterOptions.AutoReplenishment = true;
                 });
+                options.OnRejected = async (context, token) =>
+                {
+                    context.HttpContext.Response.ContentType = "application/json";
+                   await context.HttpContext.Response.WriteAsJsonAsync(new
+                    {
+                        isSuccess = false,
+                        code = 429,
+                        Message = "تعداد درخواست‌ها بیش از حد مجاز است. لطفا بعدا تلاش کنید."
+                    },token);
+                };
             });
+
             var redisConnectionString = builder.Configuration.GetValue<string>("Redis:ConnectionString");
             var oracleConnection = builder.Configuration.GetConnectionString("OracleConnection");
             builder.Services.AddHealthChecks()
@@ -74,7 +89,6 @@ namespace Note.Api
             //        await context.Response.WriteAsync("Internal Server Error");
             //    });
             //});
-            app.UseRateLimiter();
             app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<RequestResponseLoggingMiddleware>();
             app.UseMiddleware<ExceptionMiddleware>();
@@ -91,6 +105,7 @@ namespace Note.Api
                 }
             });
             app.UseHttpsRedirection();
+            app.UseRateLimiter();
             app.UseAuthorization();
 
 
@@ -101,4 +116,3 @@ namespace Note.Api
         }
     }
 }
-    

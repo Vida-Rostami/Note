@@ -6,7 +6,7 @@ using Note.Domain.Category;
 
 namespace Note.Api.Controllers
 {
-    [EnableRateLimiting("fixed")]
+    [EnableRateLimiting("token")]
     [Route("api/v1/[controller]/[action]")]
      [ApiController]
     public class CategoryController
