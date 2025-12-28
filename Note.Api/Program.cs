@@ -1,17 +1,15 @@
-﻿
-using Note.Api.Middleware;
+﻿using Note.Api.Middleware;
 using Note.Application.Category;
 using Note.Application.Note;
 using Note.Application.Tag;
+using Note.Domain;
+using Note.Infrastructure.Caching;
 using Note.Infrastructure.Category;
+using Note.Infrastructure.Log.AppLogger;
 using Note.Infrastructure.Log.ExceptionLoggerService;
 using Note.Infrastructure.Note;
 using Note.Infrastructure.Tag;
-using Note.Domain;
-using Note.Infrastructure.Log.AppLogger;
-using Note.Infrastructure.Caching;
-using Microsoft.AspNetCore.RateLimiting;
-using System.Net.Mime;
+using System.Threading.RateLimiting;
 
 namespace Note.Api
 {
@@ -47,22 +45,37 @@ namespace Note.Api
             builder.Services.AddRateLimiter(options =>
             {
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-                options.AddTokenBucketLimiter("token", limiterOptions =>
+                //options.AddTokenBucketLimiter("token", limiterOptions =>
+                //{
+                //    limiterOptions.TokenLimit = 1;
+                //    limiterOptions.TokensPerPeriod = 1;
+                //    limiterOptions.ReplenishmentPeriod = TimeSpan.FromMinutes(1);
+                //    limiterOptions.AutoReplenishment = true;
+                //});
+                options.AddPolicy("ip_token_burst", context =>
                 {
-                    limiterOptions.TokenLimit = 1;
-                    limiterOptions.TokensPerPeriod = 1;
-                    limiterOptions.ReplenishmentPeriod = TimeSpan.FromMinutes(1);
-                    limiterOptions.AutoReplenishment = true;
+                    var ip = context.Connection.RemoteIpAddress?.ToString();
+                    return RateLimitPartition.GetTokenBucketLimiter(
+                        partitionKey: ip ?? "unknown",
+                            factory: _ => new TokenBucketRateLimiterOptions
+                            {
+                                TokenLimit = 100,
+                                TokensPerPeriod = 20,
+                                ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                                AutoReplenishment = true,
+                                QueueLimit = 0
+                            }
+                    );
                 });
                 options.OnRejected = async (context, token) =>
                 {
                     context.HttpContext.Response.ContentType = "application/json";
-                   await context.HttpContext.Response.WriteAsJsonAsync(new
+                    await context.HttpContext.Response.WriteAsJsonAsync(new
                     {
                         isSuccess = false,
                         code = 429,
                         Message = "تعداد درخواست‌ها بیش از حد مجاز است. لطفا بعدا تلاش کنید."
-                    },token);
+                    }, token);
                 };
             });
 
