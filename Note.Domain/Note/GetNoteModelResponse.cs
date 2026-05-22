@@ -2,7 +2,7 @@
 
 namespace Note.Domain.Note
 {
-    public class GetNoteModel
+    public class GetNoteModelResponse
     {
         public int NoteId { get; set; }
         public string? Title { get; set; }

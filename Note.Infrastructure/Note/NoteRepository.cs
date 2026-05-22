@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
 using Note.Domain;
+using Note.Domain.Category;
+using Note.Domain.Common;
 using Note.Domain.Note;
+using Note.Domain.Pagination;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
 
@@ -15,7 +18,7 @@ namespace Note.Infrastructure.Note
             _options = options.Value;
         }
 
-        public async Task<BaseResponse<List<GetNoteModel>>> GetNote()
+        public async Task<PaginationBaseResposne<List<GetNoteModelResponse>>> GetNote(NoteFilterModel model)
         {
             try
             {
@@ -26,12 +29,20 @@ namespace Note.Infrastructure.Note
                 {
                     CommandType = CommandType.StoredProcedure
                 };
-
+                command.Parameters.Add("p_Title", OracleDbType.NVarchar2).Value = string.IsNullOrWhiteSpace(model.Title) ? (object)DBNull.Value : model.Title;
+                command.Parameters.Add("p_Text", OracleDbType.NVarchar2).Value = string.IsNullOrWhiteSpace(model.Text) ? (object)DBNull.Value : model.Text;
+                command.Parameters.Add("p_CategoryId", OracleDbType.Int32).Value = model.CategoryId.HasValue ? (object)model.CategoryId.Value : DBNull.Value;
+                command.Parameters.Add("p_TagId", OracleDbType.Int32).Value =  model.TagId.HasValue ? (object)model.TagId.Value : DBNull.Value;
+                command.Parameters.Add("p_FromDate", OracleDbType.Date).Value = string.IsNullOrWhiteSpace(model.PersianFromDate) ? (object)DBNull.Value : (object)ConvertDate.ConvertPersianToGregorian(model.PersianFromDate);
+                command.Parameters.Add("p_ToDate", OracleDbType.Date).Value = string.IsNullOrWhiteSpace(model.PersianToDate) ? (object)DBNull.Value : (object)ConvertDate.ConvertPersianToGregorian(model.PersianToDate);
+                command.Parameters.Add("p_PageNumber", OracleDbType.Int32).Value = model.PageNumber;
+                command.Parameters.Add("p_PageSize", OracleDbType.Int32).Value = model.PageSize;
+                command.Parameters.Add("p_TotalCount", OracleDbType.Int32).Direction = ParameterDirection.Output;
                 command.Parameters.Add("p_Cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
 
                 using var reader = await command.ExecuteReaderAsync();
 
-                var notesDictionary = new Dictionary<int, GetNoteModel>();
+                var notesDictionary = new Dictionary<int, GetNoteModelResponse>();
 
                 while (await reader.ReadAsync())
                 {
@@ -39,7 +50,7 @@ namespace Note.Infrastructure.Note
 
                     if (!notesDictionary.TryGetValue(noteId, out var note))
                     {
-                        note = new GetNoteModel
+                        note = new GetNoteModelResponse
                         {
                             NoteId = noteId,
                             Title = reader["Title"]?.ToString(),
@@ -56,10 +67,10 @@ namespace Note.Infrastructure.Note
                         notesDictionary.Add(noteId, note);
                     }
 
-                    if (!reader.IsDBNull(reader.GetOrdinal("TagId")))
-                    {
-                        note.Tag.Add(reader.GetInt32(reader.GetOrdinal("TagId")));
-                    }
+                    //if (!reader.IsDBNull(reader.GetOrdinal("TagId")))
+                    //{
+                    //    note.Tag.Add(reader.GetInt32(reader.GetOrdinal("TagId")));
+                    //}
 
                     if (!reader.IsDBNull(reader.GetOrdinal("TagName")))
                     {
@@ -67,26 +78,21 @@ namespace Note.Infrastructure.Note
                     }
                 }
 
-                var notes = notesDictionary.Values.ToList();
+            var totalCount = Convert.ToInt32(command.Parameters["p_TotalCount"].Value?.ToString() ?? "0");
 
-                if (!notes.Any())
-                {
-                    return new BaseResponse<List<GetNoteModel>>
-                    {
-                        IsSuccess = false,
-                        Message = "اطلاعاتی یافت نگردید",
-                        Code = 204
-                    };
-                }
+            var notes = notesDictionary.Values.ToList();
 
-                return new BaseResponse<List<GetNoteModel>>
+                return new PaginationBaseResposne<List<GetNoteModelResponse>>
                 {
-                    IsSuccess = true,
+                    PageNumber = model.PageNumber,
+                    PageSize = model.PageSize,
+                    TotalCount = totalCount,
+                    IsSuccess = notes.Any(),
                     Data = notes,
-                    Message = "اطلاعات با موفقیت دریافت شد",
-                    Code = 200
+                    Code = notes.Any() ? 200 : 204,
+                    Message = notes.Any() ? "اطلاعات با موفقیت دریافت گردید." : "اطلاعاتی یافت نشد"
                 };
-            }
+        }
             catch (Exception ex)
             {
                 //return new BaseResponse<List<GetNoteModel>>
@@ -99,7 +105,7 @@ namespace Note.Infrastructure.Note
             }
         }
 
-        public async Task<BaseResponse<GetNoteModel>> GetNote(int noteId)
+        public async Task<BaseResponse<GetNoteModelResponse>> GetNote(int noteId)
         {
             try
             {
@@ -116,13 +122,13 @@ namespace Note.Infrastructure.Note
 
                 using var reader = await command.ExecuteReaderAsync();
 
-                GetNoteModel note = null;
+                GetNoteModelResponse note = null;
 
                 while (await reader.ReadAsync())
                 {
                     if (note == null)
                     {
-                        note = new GetNoteModel
+                        note = new GetNoteModelResponse
                         {
                             NoteId = reader.GetInt32(reader.GetOrdinal("NoteId")),
                             Title = reader["Title"]?.ToString(),
@@ -146,7 +152,7 @@ namespace Note.Infrastructure.Note
 
                 if (note == null)
                 {
-                    return new BaseResponse<GetNoteModel>
+                    return new BaseResponse<GetNoteModelResponse>
                     {
                         IsSuccess = false,
                         Message = "اطلاعاتی یافت نشد",
@@ -154,7 +160,7 @@ namespace Note.Infrastructure.Note
                     };
                 }
 
-                return new BaseResponse<GetNoteModel>
+                return new BaseResponse<GetNoteModelResponse>
                 {
                     IsSuccess = true,
                     Data = note,

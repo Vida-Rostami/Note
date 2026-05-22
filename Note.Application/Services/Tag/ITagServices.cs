@@ -1,7 +1,7 @@
 ﻿using Note.Domain.Tag;
 using Note.Domain;
 
-namespace Note.Application.Tag
+namespace Note.Application.Services.Tag
 {
     public interface ITagServices
     {

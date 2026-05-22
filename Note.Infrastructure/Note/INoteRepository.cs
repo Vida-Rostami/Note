@@ -1,12 +1,13 @@
 ﻿using Note.Domain;
 using Note.Domain.Note;
+using Note.Domain.Pagination;
 
 namespace Note.Infrastructure.Note
 {
     public interface INoteRepository
     {
-        Task<BaseResponse<List<GetNoteModel>>> GetNote();
-        Task<BaseResponse<GetNoteModel>> GetNote(int noteId);
+        Task<PaginationBaseResposne<List<GetNoteModelResponse>>> GetNote(NoteFilterModel model);
+        Task<BaseResponse<GetNoteModelResponse>> GetNote(int noteId);
         Task<BaseResponse> InsertNote(AddNoteModel model);
         Task<BaseResponse> UpdateNote(UpdateNoteModel model);
         Task<BaseResponse> DeleteNote(int noteId);

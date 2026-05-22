@@ -1,8 +1,9 @@
 ﻿using Note.Infrastructure.Note;
 using Note.Domain;
 using Note.Domain.Note;
+using Note.Domain.Pagination;
 
-namespace Note.Application.Note
+namespace Note.Application.Services.Note
 {
     public class NoteServices : INoteServices
     {
@@ -12,12 +13,12 @@ namespace Note.Application.Note
         {
             _noteRepository = noteRepository;
         }
-        public async Task<BaseResponse<List<GetNoteModel>>> GetNote()
+        public async Task<PaginationBaseResposne<List<GetNoteModelResponse>>> GetNote(NoteFilterModel model)
         {
-            return await _noteRepository.GetNote();
+            return await _noteRepository.GetNote(model);
         }
 
-        public async Task<BaseResponse<GetNoteModel>> GetNote(int noteId)
+        public async Task<BaseResponse<GetNoteModelResponse>> GetNote(int noteId)
         {
             return await _noteRepository.GetNote(noteId);
         }

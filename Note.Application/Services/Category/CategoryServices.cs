@@ -3,8 +3,9 @@ using Note.Domain;
 using Note.Domain.Category;
 using Note.Infrastructure.Caching;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Note.Domain.Pagination;
 
-namespace Note.Application.Category
+namespace Note.Application.Services.Category
 {
     public class CategoryServices : ICategoryServices
     {
@@ -17,35 +18,35 @@ namespace Note.Application.Category
             _cacheService = cacheService;
         }
 
-        public async Task<BaseResponse<List<GetCategoryModel>>> Get()
-        {
-            var cacheKey = $"category_all";
-            var cachedCategory = await _cacheService.Get<List<GetCategoryModel>>(cacheKey);
-            if (cachedCategory != null)
+            public async Task<PaginationBaseResposne<List<GetCategoryModel>>> Get(int pageNumber, int pageSize)
             {
-                return new BaseResponse<List<GetCategoryModel>>
+                var cacheKey = $"category_{pageNumber}_{pageSize}";
+                var cachedCategory = await _cacheService.Get<List<GetCategoryModel>>(cacheKey);
+                if (cachedCategory != null)
                 {
-                    Data = cachedCategory,
-                    IsSuccess = true,
-                    Code = 200,
-                    Message = "با موفقیت دریافت گردید."
-                };
-            }
+                    return new PaginationBaseResposne<List<GetCategoryModel>>
+                    {
+                        Data = cachedCategory,
+                        IsSuccess = true,
+                        Code = 200,
+                        Message = "با موفقیت دریافت گردید."
+                    };
+                }
 
 
-            var data = await _categoryRepository.Get();
-            if (data == null)
-            {
-                return new BaseResponse<List<GetCategoryModel>>
+                var data = await _categoryRepository.Get(pageNumber, pageSize);
+                if (data == null)
                 {
-                    Code = 204,
-                    IsSuccess = true,
-                    Message = "اطلاعاتی یافت نگردید."
-                };
+                    return new PaginationBaseResposne<List<GetCategoryModel>>
+                    {
+                        Code = 204,
+                        IsSuccess = true,
+                        Message = "اطلاعاتی یافت نگردید."
+                    };
+                }
+                await _cacheService.Set(cacheKey, data.Data, TimeSpan.FromMinutes(5));
+                return data;
             }
-            await _cacheService.Set(cacheKey, data.Data, TimeSpan.FromMinutes(5));
-            return data;
-        }
 
         public async Task<BaseResponse<GetCategoryModel>> Get(int catgoryId)
         {

@@ -11,4 +11,8 @@
     <ProjectReference Include="..\Note.Domain\Note.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\" />
+  </ItemGroup>
+
 </Project>

@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Note.Application.Category;
+using Note.Application.Services.Category;
 using Note.Domain;
 using Note.Domain.Category;
+using Note.Domain.Pagination;
 
 namespace Note.Api.Controllers
 {
@@ -21,9 +22,9 @@ namespace Note.Api.Controllers
         //add update by http method
 
         [HttpGet]
-        public async Task<BaseResponse<List<GetCategoryModel>>> Get()
+        public async Task<PaginationBaseResposne<List<GetCategoryModel>>> Get(int pageNumber = 1, int pageSize = 10)
         {
-            return await _categoryServices.Get();
+            return await _categoryServices.Get(pageNumber, pageSize);
         }
 
         [HttpGet("id")]

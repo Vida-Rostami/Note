@@ -1,8 +1,5 @@
 
 using Note.Api.Middleware;
-using Note.Application.Category;
-using Note.Application.Note;
-using Note.Application.Tag;
 using Note.Infrastructure.Category;
 using Note.Infrastructure.Log.ExceptionLoggerService;
 using Note.Infrastructure.Note;
@@ -11,6 +8,9 @@ using Note.Domain;
 using Note.Infrastructure.Log.AppLogger;
 using Note.Infrastructure.Caching;
 using Microsoft.AspNetCore.RateLimiting;
+using Note.Application.Services.Category;
+using Note.Application.Services.Tag;
+using Note.Application.Services.Note;
 
 namespace Note.Api
 {

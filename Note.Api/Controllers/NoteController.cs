@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using Note.Application.Note;
+using Note.Application.Services.Note;
 using Note.Domain;
 using Note.Domain.Note;
+using Note.Domain.Pagination;
 
 namespace Note.Api.Controllers
 {
@@ -17,13 +18,13 @@ namespace Note.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<BaseResponse<List<GetNoteModel>>> GetNote()
+        public async Task<PaginationBaseResposne<List<GetNoteModelResponse>>> GetNote([FromQuery] NoteFilterModel model)
         {
-            return await _noteServices.GetNote();
+            return await _noteServices.GetNote(model);
         }
 
         [HttpGet("noteId")]
-        public async Task<BaseResponse<GetNoteModel>> GetNote([FromQuery]int noteId)
+        public async Task<BaseResponse<GetNoteModelResponse>> GetNote([FromQuery]int noteId)
         {
            return await _noteServices.GetNote(noteId);
         }

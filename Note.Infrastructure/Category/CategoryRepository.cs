@@ -5,6 +5,7 @@ using Note.Domain;
 using Note.Domain.Category;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
+using Note.Domain.Pagination;
 
 namespace Note.Infrastructure.Category
 {
@@ -76,7 +77,7 @@ namespace Note.Infrastructure.Category
         //        //};
         //    }
         //}
-        public async Task<BaseResponse<List<GetCategoryModel>>> Get()
+        public async Task<PaginationBaseResposne<List<GetCategoryModel>>> Get(int pageNumber, int pageSize)
         {
             return await PollyHelper.ExecuteWithRetryAsync(async () =>
             {
@@ -87,6 +88,9 @@ namespace Note.Infrastructure.Category
                 {
                     CommandType = CommandType.StoredProcedure
                 };
+                command.Parameters.Add("p_PageNumber", OracleDbType.Int32).Value = pageNumber;
+                command.Parameters.Add("p_PageSize", OracleDbType.Int32).Value = pageSize;
+                command.Parameters.Add("p_TotalCount", OracleDbType.Int32).Direction = ParameterDirection.Output;
                 command.Parameters.Add("p_Cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
 
                 using var reader = await command.ExecuteReaderAsync();
@@ -102,9 +106,12 @@ namespace Note.Infrastructure.Category
                         ModifyDateTime = reader.IsDBNull(reader.GetOrdinal("ModifyDateTime")) ? null : (reader.GetDateTime(reader.GetOrdinal("ModifyDateTime"))),
                     });
                 }
-
-                return new BaseResponse<List<GetCategoryModel>>
+                var totalCount = Convert.ToInt32(command.Parameters["p_TotalCount"].Value?.ToString() ?? "0");
+                return new PaginationBaseResposne<List<GetCategoryModel>>
                 {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalCount = totalCount,
                     IsSuccess = categories.Any(),
                     Data = categories,
                     Code = categories.Any() ? 200 : 204,

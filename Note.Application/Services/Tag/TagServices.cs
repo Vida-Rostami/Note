@@ -4,7 +4,7 @@ using Note.Domain.Tag;
 using Note.Infrastructure.Caching;
 using Note.Domain.Category;
 
-namespace Note.Application.Tag
+namespace Note.Application.Services.Tag
 {
     public class TagServices : ITagServices
     {
@@ -26,7 +26,7 @@ namespace Note.Application.Tag
         {
             var cachedKey = $"tag_{tagId}";
             var tagCached = await _cacheService.Get<GetTagModel>(cachedKey);
-            if(tagCached != null)
+            if (tagCached != null)
             {
                 return new BaseResponse<GetTagModel>
                 {
@@ -37,8 +37,8 @@ namespace Note.Application.Tag
                 };
             }
 
-            var result =  await _tagRepository.GetTag(tagId);
-            if(result == null)
+            var result = await _tagRepository.GetTag(tagId);
+            if (result == null)
             {
                 return new BaseResponse<GetTagModel>
                 {
