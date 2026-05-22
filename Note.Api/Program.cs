@@ -1,7 +1,4 @@
 ﻿using Note.Api.Middleware;
-using Note.Application.Category;
-using Note.Application.Note;
-using Note.Application.Tag;
 using Note.Domain;
 using Note.Infrastructure.Caching;
 using Note.Infrastructure.Category;
@@ -58,21 +55,21 @@ namespace Note.Api
                 //    limiterOptions.ReplenishmentPeriod = TimeSpan.FromMinutes(1);
                 //    limiterOptions.AutoReplenishment = true;
                 //});
-                options.AddPolicy("ip_token_burst", context =>
-                {
-                    var ip = context.Connection.RemoteIpAddress?.ToString();
-                    return RateLimitPartition.GetTokenBucketLimiter(
-                        partitionKey: ip ?? "unknown",
-                            factory: _ => new TokenBucketRateLimiterOptions
-                            {
-                                TokenLimit = 100,
-                                TokensPerPeriod = 20,
-                                ReplenishmentPeriod = TimeSpan.FromMinutes(1),
-                                AutoReplenishment = true,
-                                QueueLimit = 0
-                            }
-                    );
-                });
+                //options.AddPolicy("ip_token_burst", context =>
+                //{
+                //    var ip = context.Connection.RemoteIpAddress?.ToString();
+                //    return RateLimitPartition.GetTokenBucketLimiter(
+                //        partitionKey: ip ?? "unknown",
+                //            factory: _ => new TokenBucketRateLimiterOptions
+                //            {
+                //                TokenLimit = 100,
+                //                TokensPerPeriod = 20,
+                //                ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                //                AutoReplenishment = true,
+                //                QueueLimit = 0
+                //            }
+                //    );
+                //});
                 options.OnRejected = async (context, token) =>
                 {
                     context.HttpContext.Response.ContentType = "application/json";
