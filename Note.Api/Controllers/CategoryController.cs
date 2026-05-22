@@ -7,7 +7,7 @@ using Note.Domain.Pagination;
 
 namespace Note.Api.Controllers
 {
-    [EnableRateLimiting("fixed")]
+    [EnableRateLimiting("ip_token_burst")]
     [Route("api/v1/[controller]/[action]")]
      [ApiController]
     public class CategoryController
