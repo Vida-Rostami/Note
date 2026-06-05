@@ -4,6 +4,7 @@ using Note.Domain.Category;
 using Note.Infrastructure.Caching;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Note.Domain.Pagination;
+using System.Net;
 
 namespace Note.Application.Services.Category
 {
@@ -28,7 +29,7 @@ namespace Note.Application.Services.Category
                     {
                         Data = cachedCategory,
                         IsSuccess = true,
-                        Code = 200,
+                        Code = (int)HttpStatusCode.OK,
                         Message = "با موفقیت دریافت گردید."
                     };
                 }
@@ -39,7 +40,7 @@ namespace Note.Application.Services.Category
                 {
                     return new PaginationBaseResposne<List<GetCategoryModel>>
                     {
-                        Code = 204,
+                        Code = (int)HttpStatusCode.NoContent,
                         IsSuccess = true,
                         Message = "اطلاعاتی یافت نگردید."
                     };
@@ -58,7 +59,7 @@ namespace Note.Application.Services.Category
                 {
                     Data = cachedCategory,
                     IsSuccess = true,
-                    Code = 200,
+                    Code = (int)HttpStatusCode.OK,
                     Message = "با موفقیت دریافت گردید."
                 };
             }
@@ -69,7 +70,7 @@ namespace Note.Application.Services.Category
             {
                 return new BaseResponse<GetCategoryModel>
                 {
-                    Code = 204,
+                    Code = (int)HttpStatusCode.NoContent,
                     IsSuccess = true,
                     Message = "اطلاعاتی یافت نگردید."
                 };

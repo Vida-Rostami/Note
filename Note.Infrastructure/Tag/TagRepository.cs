@@ -4,6 +4,7 @@ using Note.Domain;
 using Note.Domain.Tag;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
+using System.Net;
 using System.Text;
 namespace Note.Infrastructure.Tag
 {
@@ -18,8 +19,6 @@ namespace Note.Infrastructure.Tag
 
         public async Task<BaseResponse<List<GetTagModel>>> GetTag()
         {
-            try
-            {
                 using var connection = new OracleConnection(_option.OracleConnection);
                 await connection.OpenAsync();
 
@@ -51,35 +50,21 @@ namespace Note.Infrastructure.Tag
                     {
                         IsSuccess = false,
                         Message = "اطلاعاتی یافت نگردید",
-                        Code = 204
+                        Code = (int)HttpStatusCode.NoContent
                     };
                 }
-
 
                 return new BaseResponse<List<GetTagModel>>
                 {
                     IsSuccess = true,
                     Data = tags,
                     Message = "اطلاعات با موفقیت دریافت گردید.",
-                    Code = 200
-                };
-            }
-            catch (Exception ex)
-            {
-                //return new BaseResponse<List<GetTagModel>>
-                //{
-                //    IsSuccess = false,
-                //    Message = $"خطا در دریافت اطلاعات",
-                //    Code = 500
-                //};
-                throw;
-            }
+                    Code = (int)HttpStatusCode.OK
+                };            
         }
 
         public async Task<BaseResponse<GetTagModel>> GetTag(int tagId)
         {
-            try
-            {
                 using var connection = new OracleConnection(_option.OracleConnection);
                 await connection.OpenAsync();
 
@@ -107,34 +92,20 @@ namespace Note.Infrastructure.Tag
                     {
                         IsSuccess = false,
                         Message = "اطلاعاتی یافت نشد",
-                        Code = 204
+                        Code = (int)HttpStatusCode.NoContent
                     };
                 }
                 return new BaseResponse<GetTagModel>
                 {
                     Data = tag,
                     IsSuccess = true,
-                    Code = 200,
+                    Code = (int)HttpStatusCode.OK,
                     Message = "با موفقیت دریافت شد"
-                };
-            }
-            catch (Exception ex)
-            {
-                // TODO: log ex.Message
-                //return new BaseResponse<GetTagModel>
-                //{
-                //    IsSuccess = false,
-                //    Code = 500,
-                //    Message = "خطایی رخ داده است"
-                //};
-                throw;
-            }
+                };           
         }
 
         public async Task<BaseResponse> InsertTag(AddTagModel model)
         {
-            try
-            {
                 using (var connection = new OracleConnection(_option.OracleConnection))
                 {
                     await connection.OpenAsync();
@@ -144,38 +115,23 @@ namespace Note.Infrastructure.Tag
                     return new BaseResponse
                     {
                         IsSuccess = true,
-                        Code = 201,
+                        Code = (int)HttpStatusCode.NoContent,
                         Message = "با موفقیت درج شد",
                     };
                 }
-            }
-            catch (Exception ex)
-            {
-                //log
-                //return new BaseResponse
-                //{
-                //    IsSuccess = false,
-                //    Code = 500,
-                //    Message = "خطایی رخ داده است"
-                //};
-                throw;
-            }
-
         }
 
         public async Task<BaseResponse> UpdateTag(UpdateTagModel model)
         {
-            try
-            {
-                var getTag = GetTag(model.TagId);
+                var getTag = await GetTag(model.TagId);
                 if (getTag != null)
                 {
-                    if (getTag.Result.Code == 204)
+                    if (getTag.Code == (int)HttpStatusCode.NoContent)
                     {
                         return new BaseResponse
                         {
                             IsSuccess = false,
-                            Code = 204,
+                            Code = (int)HttpStatusCode.NoContent,
                             Message = "با شناسه وارد شده داده ای یافت نشد."
                         };
                     }
@@ -190,36 +146,22 @@ namespace Note.Infrastructure.Tag
                     return new BaseResponse
                     {
                         IsSuccess = true,
-                        Code = 200,
+                        Code = (int)HttpStatusCode.OK,
                         Message = "با موفقیت اپدیت شد",
                     };
-                }
-            }
-            catch (Exception ex)
-            {
-                //log
-                //return new BaseResponse
-                //{
-                //    IsSuccess = false,
-                //    Code = 500,
-                //    Message = "خطایی رخ داده است"
-                //};
-                throw;
-            }
+                }           
         }
         public async Task<BaseResponse> DeleteTag(int tagId)
         {
-            try
-            {
-                var getTag = GetTag(tagId);
+                var getTag =await GetTag(tagId);
                 if (getTag != null)
                 {
-                    if (getTag.Result.Code == 204)
+                    if (getTag.Code == (int)HttpStatusCode.NoContent)
                     {
                         return new BaseResponse
                         {
                             IsSuccess = false,
-                            Code = 204,
+                            Code = (int)HttpStatusCode.NoContent,
                             Message = "با شناسه وارد شده داده ای یافت نشد."
                         };
                     }
@@ -233,22 +175,10 @@ namespace Note.Infrastructure.Tag
                     return new BaseResponse
                     {
                         IsSuccess = true,
-                        Code = 200,
+                        Code = (int)HttpStatusCode.OK,
                         Message = "با موفقیت حذف شد",
                     };
-                }
-            }
-            catch (Exception ex)
-            {
-                //log
-                //return new BaseResponse
-                //{
-                //    IsSuccess = false,
-                //    Code = 500,
-                //    Message = "خطایی رخ داده است"
-                //};
-                throw;
-            }
+                }            
         }
     }
 }

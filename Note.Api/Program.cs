@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Note.Application.Services.Category;
 using Note.Application.Services.Tag;
 using Note.Application.Services.Note;
+using System.Configuration;
 
 namespace Note.Api
 {
@@ -28,6 +29,7 @@ namespace Note.Api
             builder.Services.AddSwaggerGen();
 
             builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("ConnectionStrings"));
+            builder.Services.Configure<PaginationSettings>(builder.Configuration.GetSection("PaginationSettings"));
             builder.Services.AddScoped<INoteServices, NoteServices>();
             builder.Services.AddScoped<ITagServices, TagServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();

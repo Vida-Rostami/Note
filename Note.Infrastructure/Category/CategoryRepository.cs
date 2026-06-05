@@ -1,87 +1,32 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
-using Note.Infrastructure.Common;
 using Note.Domain;
 using Note.Domain.Category;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using Note.Domain.Pagination;
+using System.Net;
+using Oracle.ManagedDataAccess.Types;
+using Note.Infrastructure.Common.Retry;
+using Polly;
 
 namespace Note.Infrastructure.Category
 {
     public class CategoryRepository : ICategoryRepository
     {
-        private DatabaseSettings _options;
-
+        private DatabaseSettings _databaseOptions;
+        private readonly IAsyncPolicy _policy;
         public CategoryRepository(IOptions<DatabaseSettings> options)
         {
-            _options = options.Value;
+            _databaseOptions = options.Value;
+            _policy = PollyHelper.CreateOracleRetryPolicy();
         }
 
-        //public async Task<BaseResponse<List<GetCategoryModel>>> Get()
-        //{
-        //    try
-        //    {
-        //        using var connection = new OracleConnection(_options.OracleConnection);
-        //        await connection.OpenAsync();
-
-        //        using var command = new OracleCommand("Sp_GetAllCategory", connection)
-        //        {
-        //            CommandType = CommandType.StoredProcedure
-        //        };
-
-        //        command.Parameters.Add("p_Cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
-
-        //        using var reader = await command.ExecuteReaderAsync();
-
-        //        var tags = new List<GetCategoryModel>();
-        //        while (await reader.ReadAsync())
-        //        {
-        //            var tag = new GetCategoryModel
-        //            {
-        //                CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId")),
-        //                CategoryName = reader.GetString("CategoryName"),
-        //                CreateDateTime = reader.IsDBNull(reader.GetOrdinal("CreateDateTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
-        //                ModifyDateTime = reader.IsDBNull(reader.GetOrdinal("ModifyDateTime")) ? null : (reader.GetDateTime(reader.GetOrdinal("ModifyDateTime"))),
-        //            };
-        //            tags.Add(tag);
-        //        }
-
-        //        if (!tags.Any())
-        //        {
-        //            return new BaseResponse<List<GetCategoryModel>>
-        //            {
-        //                IsSuccess = false,
-        //                Message = "اطلاعاتی یافت نگردید",
-        //                Code = 204
-        //            };
-        //        }
-
-
-        //        return new BaseResponse<List<GetCategoryModel>>
-        //        {
-        //            IsSuccess = true,
-        //            Data = tags,
-        //            Message = "اطلاعات با موفقیت دریافت گردید.",
-        //            Code = 200
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw;
-        //        //return new BaseResponse<List<GetCategoryModel>>
-        //        //{
-        //        //    IsSuccess = false,
-        //        //    Message = $"خطا در دریافت اطلاعات",
-        //        //    Code = 500
-        //        //};
-        //    }
-        //}
         public async Task<PaginationBaseResposne<List<GetCategoryModel>>> Get(int pageNumber, int pageSize)
         {
-            return await PollyHelper.ExecuteWithRetryAsync(async () =>
+            return await _policy.ExecuteAsync(async () =>
             {
-                using var connection = new OracleConnection(_options.OracleConnection);
+                using var connection = new OracleConnection(_databaseOptions.OracleConnection);
                 await connection.OpenAsync();
 
                 using var command = new OracleCommand("Sp_GetAllCategory", connection)
@@ -106,7 +51,10 @@ namespace Note.Infrastructure.Category
                         ModifyDateTime = reader.IsDBNull(reader.GetOrdinal("ModifyDateTime")) ? null : (reader.GetDateTime(reader.GetOrdinal("ModifyDateTime"))),
                     });
                 }
-                var totalCount = Convert.ToInt32(command.Parameters["p_TotalCount"].Value?.ToString() ?? "0");
+                var totalObj = command.Parameters["p_TotalCount"].Value;
+                var totalCount = totalObj == null || totalObj == DBNull.Value
+                    ? 0
+                    : ((OracleDecimal)totalObj).ToInt32();
                 return new PaginationBaseResposne<List<GetCategoryModel>>
                 {
                     PageNumber = pageNumber,
@@ -114,72 +62,17 @@ namespace Note.Infrastructure.Category
                     TotalCount = totalCount,
                     IsSuccess = categories.Any(),
                     Data = categories,
-                    Code = categories.Any() ? 200 : 204,
+                    Code = categories.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.NoContent,
                     Message = categories.Any() ? "اطلاعات با موفقیت دریافت گردید." : "اطلاعاتی یافت نشد"
                 };
             });
         }
 
-        //public async Task<BaseResponse<GetCategoryModel>> Get(int categoryId)
-        //{
-        //    try
-        //    {
-        //        using var connection = new OracleConnection(_options.OracleConnection);
-        //        await connection.OpenAsync();
-
-        //        using var command = new OracleCommand("SP_GetCategoryById", connection)
-        //        {
-        //            CommandType = CommandType.StoredProcedure
-        //        };
-
-        //        command.Parameters.Add("p_CategoryId", OracleDbType.Int32).Value = categoryId;
-        //        command.Parameters.Add("p_Cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
-
-        //        GetCategoryModel category = null;
-
-        //        using var reader = await command.ExecuteReaderAsync();
-
-        //        if (await reader.ReadAsync())
-        //        {
-        //            category = new GetCategoryModel
-        //            {
-        //                CategoryName = reader.IsDBNull(reader.GetOrdinal("CategoryName")) ? null : reader.GetString(reader.GetOrdinal("CategoryName"))
-        //            };
-        //        }
-        //        if (category == null)
-        //        {
-        //            return new BaseResponse<GetCategoryModel>
-        //            {
-        //                IsSuccess = false,
-        //                Message = "اطلاعاتی یافت نشد",
-        //                Code = 204
-        //            };
-        //        }
-        //        return new BaseResponse<GetCategoryModel>
-        //        {
-        //            Data = category,
-        //            IsSuccess = true,
-        //            Code = 200,
-        //            Message = "با موفقیت دریافت شد"
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // TODO: log ex.Message
-        //        //return new BaseResponse<GetCategoryModel>
-        //        //{
-        //        //    IsSuccess = false,
-        //        //    Code = 500,
-        //        //    Message = "خطایی رخ داده است"
-        //        //};
-        //        throw;
-        //    }
-        //}
         public async Task<BaseResponse<GetCategoryModel>> Get(int categoryId)
         {
-            return await PollyHelper.ExecuteWithRetryAsync(async () =>
+            return await _policy.ExecuteAsync(async () =>
             {
-                using var connection = new OracleConnection(_options.OracleConnection);
+                using var connection = new OracleConnection(_databaseOptions.OracleConnection);
                 await connection.OpenAsync();
 
                 using var command = new OracleCommand("SP_GetCategoryById", connection)
@@ -208,7 +101,7 @@ namespace Note.Infrastructure.Category
                     {
                         IsSuccess = false,
                         Message = "اطلاعاتی یافت نشد",
-                        Code = 204
+                        Code = (int)HttpStatusCode.NoContent
                     };
                 }
 
@@ -216,48 +109,17 @@ namespace Note.Infrastructure.Category
                 {
                     Data = category,
                     IsSuccess = true,
-                    Code = 200,
+                    Code = (int)HttpStatusCode.OK,
                     Message = "با موفقیت دریافت شد"
                 };
             });
         }
-        //public async Task<BaseResponse> Insert(AddCategoryModel model)
-        //{
-        //    return await PollyHelper.ExecuteWithRetryAsync(async () => {
-        //        try
-        //        {
-        //            using (var connection = new OracleConnection(_options.OracleConnection))
-        //            {
-        //                await connection.OpenAsync();
-        //                var parameters = new DynamicParameters();
-        //                parameters.Add("P_CategoryName", model.CategoryName, DbType.String, ParameterDirection.Input);
-        //                await connection.ExecuteAsync("SP_InsertCategory", parameters, commandType: CommandType.StoredProcedure);
-        //                return new BaseResponse
-        //                {
-        //                    IsSuccess = true,
-        //                    Code = 201,
-        //                    Message = "با موفقیت درج شد",
-        //                };
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            //log
-        //            //    return new BaseResponse
-        //            //    {
-        //            //        IsSuccess = false,
-        //            //        Code = 500,
-        //            //        Message = "خطایی رخ داده است"
-        //            //    };
-        //            //}
-        //            throw;
-        //        }
-        //    }
+        
         public async Task<BaseResponse> Insert(AddCategoryModel model)
         {
-            return await PollyHelper.ExecuteWithRetryAsync(async () =>
+            return await _policy.ExecuteAsync(async () =>
             {
-                using (var connection = new OracleConnection(_options.OracleConnection))
+                using (var connection = new OracleConnection(_databaseOptions.OracleConnection))
                 {
                     await connection.OpenAsync();
                     var parameters = new DynamicParameters();
@@ -266,75 +128,31 @@ namespace Note.Infrastructure.Category
                     return new BaseResponse
                     {
                         IsSuccess = true,
-                        Code = 201,
+                        Code = (int)HttpStatusCode.Created,
                         Message = "با موفقیت درج شد",
                     };
                 }
             });
         }
-        //public async Task<BaseResponse> Update(UpdateCategoryModel model)
-        //{
-        //    try
-        //    {
-        //        var getCategory = Get(model.CategoryId);
-        //        if (getCategory != null)
-        //        {
-        //            if (getCategory.Result.Code == 204)
-        //            {
-        //                return new BaseResponse
-        //                {
-        //                    IsSuccess = false,
-        //                    Code = 204,
-        //                    Message = "با شناسه وارد شده داده ای یافت نشد."
-        //                };
-        //            }
-        //        }
-        //        using (var connection = new OracleConnection(_options.OracleConnection))
-        //        {
-        //            await connection.OpenAsync();
-        //            var parameters = new DynamicParameters();
-        //            parameters.Add("P_CategoryId", model.CategoryId, DbType.Int32, ParameterDirection.Input);
-        //            parameters.Add("P_CategoryName", model.CategoryName, DbType.String, ParameterDirection.Input);
-        //            await connection.ExecuteAsync("SP_UpdateCategory", parameters, commandType: CommandType.StoredProcedure);
-        //            return new BaseResponse
-        //            {
-        //                IsSuccess = true,
-        //                Code = 201,
-        //                Message = "با موفقیت اپدیت شد",
-        //            };
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        //log
-        //        //return new BaseResponse
-        //        //{
-        //        //    IsSuccess = false,
-        //        //    Code = 500,
-        //        //    Message = "خطایی رخ داده است"
-        //        //};
-        //        throw;
-        //    }
-        //}
 
         public async Task<BaseResponse> Update(UpdateCategoryModel model)
         {
-            return await PollyHelper.ExecuteWithRetryAsync(async () =>
+            return await _policy.ExecuteAsync(async () =>
             {
-                var getCategory = Get(model.CategoryId);
+                var getCategory = await Get(model.CategoryId);
                 if (getCategory != null)
                 {
-                    if (getCategory.Result.Code == 204)
+                    if (getCategory.Code == (int)HttpStatusCode.NoContent)
                     {
                         return new BaseResponse
                         {
                             IsSuccess = false,
-                            Code = 204,
+                            Code = (int)HttpStatusCode.NoContent,
                             Message = "با شناسه وارد شده داده ای یافت نشد."
                         };
                     }
                 }
-                using (var connection = new OracleConnection(_options.OracleConnection))
+                using (var connection = new OracleConnection(_databaseOptions.OracleConnection))
                 {
                     await connection.OpenAsync();
                     var parameters = new DynamicParameters();
@@ -344,75 +162,31 @@ namespace Note.Infrastructure.Category
                     return new BaseResponse
                     {
                         IsSuccess = true,
-                        Code = 201,
+                        Code = (int)HttpStatusCode.OK,
                         Message = "با موفقیت اپدیت شد",
                     };
                 }
             });
         }
 
-        //public async Task<BaseResponse> Delete(int categoryId)
-        //{
-        //    try
-        //    {
-        //        var getCategory = Get(categoryId);
-        //        if (getCategory != null)
-        //        {
-        //            if (getCategory.Result.Code == 204)
-        //            {
-        //                return new BaseResponse
-        //                {
-        //                    IsSuccess = false,
-        //                    Code = 204,
-        //                    Message = "با شناسه وارد شده داده ای یافت نشد."
-        //                };
-        //            }
-        //        }
-        //        using (var connection = new OracleConnection(_options.OracleConnection))
-        //        {
-        //            await connection.OpenAsync();
-        //            var parameters = new DynamicParameters();
-        //            parameters.Add("P_CategoryId", categoryId, DbType.Int32, ParameterDirection.Input);
-        //            await connection.ExecuteAsync("SP_DeleteCategory", parameters, commandType: CommandType.StoredProcedure);
-        //            return new BaseResponse
-        //            {
-        //                IsSuccess = true,
-        //                Code = 201,
-        //                Message = "با موفقیت حدف شد",
-        //            };
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        //log
-        //        //return new BaseResponse
-        //        //{
-        //        //    IsSuccess = false,
-        //        //    Code = 500,
-        //        //    Message = "خطایی رخ داده است"
-        //        //};
-        //        throw;
-        //    }
-        //}
-
         public async Task<BaseResponse> Delete(int categoryId)
         {
-            return await PollyHelper.ExecuteWithRetryAsync(async () =>
+            return await _policy.ExecuteAsync(async () =>
             {
-                var getCategory = Get(categoryId);
+                var getCategory = await Get(categoryId);
                 if (getCategory != null)
                 {
-                    if (getCategory.Result.Code == 204)
+                    if (getCategory.Code == (int)HttpStatusCode.NoContent)
                     {
                         return new BaseResponse
                         {
                             IsSuccess = false,
-                            Code = 204,
+                            Code = (int)HttpStatusCode.NoContent,
                             Message = "با شناسه وارد شده داده ای یافت نشد."
                         };
                     }
                 }
-                using (var connection = new OracleConnection(_options.OracleConnection))
+                using (var connection = new OracleConnection(_databaseOptions.OracleConnection))
                 {
                     await connection.OpenAsync();
                     var parameters = new DynamicParameters();
@@ -421,7 +195,7 @@ namespace Note.Infrastructure.Category
                     return new BaseResponse
                     {
                         IsSuccess = true,
-                        Code = 201,
+                        Code = (int)HttpStatusCode.OK,
                         Message = "با موفقیت حذف شد",
                     };
                 }

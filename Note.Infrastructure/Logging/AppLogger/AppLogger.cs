@@ -13,15 +13,15 @@ namespace Note.Infrastructure.Log.AppLogger
 {
     public class AppLogger : IAppLogger 
     {
-        private readonly DatabaseSettings _options;
+        private readonly DatabaseSettings _databaseOptions;
         
         public AppLogger(IOptions<DatabaseSettings> options)
         {
-            _options = options.Value;
+            _databaseOptions = options.Value;
         }
         public async Task Log(AppLog appLog)
         {
-            using var connection = new OracleConnection(_options.OracleConnection); 
+            using var connection = new OracleConnection(_databaseOptions.OracleConnection); 
             connection.Open();
             var sql = @"
                 INSERT INTO TBLAPPLOG

@@ -3,6 +3,7 @@ using Note.Domain;
 using Note.Domain.Tag;
 using Note.Infrastructure.Caching;
 using Note.Domain.Category;
+using System.Net;
 
 namespace Note.Application.Services.Tag
 {
@@ -32,7 +33,7 @@ namespace Note.Application.Services.Tag
                 {
                     Data = tagCached,
                     IsSuccess = true,
-                    Code = 200,
+                    Code = (int)HttpStatusCode.OK,
                     Message = "با موفقیت دریافت گردید."
                 };
             }
@@ -42,7 +43,7 @@ namespace Note.Application.Services.Tag
             {
                 return new BaseResponse<GetTagModel>
                 {
-                    Code = 204,
+                    Code = (int)HttpStatusCode.NoContent,
                     IsSuccess = true,
                     Message = "اطلاعاتی یافت نگردید."
                 };
