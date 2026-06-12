@@ -5,5 +5,8 @@
         Task<T> Get<T>(string key);
         Task Set<T>(string key, T value, TimeSpan expiration);
         Task Remove(string key);
+        Task<int> GetVersion(string key);
+
+        Task IncrementVersion(string key);
     }
 }

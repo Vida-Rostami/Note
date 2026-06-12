@@ -1,10 +1,12 @@
-﻿using Note.Infrastructure.Category;
+﻿using Microsoft.Extensions.Options;
+using Note.Application.Commons;
 using Note.Domain;
 using Note.Domain.Category;
-using Note.Infrastructure.Caching;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Note.Domain.Pagination;
+using Note.Infrastructure.Caching;
+using Note.Infrastructure.Category;
 using System.Net;
+using System.Reflection;
 
 namespace Note.Application.Services.Category
 {
@@ -12,89 +14,139 @@ namespace Note.Application.Services.Category
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly ICacheService _cacheService;
+        private PaginationSettings _paginationOptions;
 
-        public CategoryServices(ICategoryRepository categoryRepository, ICacheService cacheService)
+        public CategoryServices(ICategoryRepository categoryRepository, ICacheService cacheService, IOptions<PaginationSettings> paginationOptions)
         {
             _categoryRepository = categoryRepository;
             _cacheService = cacheService;
+            _paginationOptions = paginationOptions.Value;
         }
 
-            public async Task<PaginationBaseResposne<List<GetCategoryModel>>> Get(int pageNumber, int pageSize)
-            {
-                var cacheKey = $"category_{pageNumber}_{pageSize}";
-                var cachedCategory = await _cacheService.Get<List<GetCategoryModel>>(cacheKey);
-                if (cachedCategory != null)
-                {
-                    return new PaginationBaseResposne<List<GetCategoryModel>>
-                    {
-                        Data = cachedCategory,
-                        IsSuccess = true,
-                        Code = (int)HttpStatusCode.OK,
-                        Message = "با موفقیت دریافت گردید."
-                    };
-                }
-
-
-                var data = await _categoryRepository.Get(pageNumber, pageSize);
-                if (data == null)
-                {
-                    return new PaginationBaseResposne<List<GetCategoryModel>>
-                    {
-                        Code = (int)HttpStatusCode.NoContent,
-                        IsSuccess = true,
-                        Message = "اطلاعاتی یافت نگردید."
-                    };
-                }
-                await _cacheService.Set(cacheKey, data.Data, TimeSpan.FromMinutes(5));
-                return data;
-            }
-
-        public async Task<BaseResponse<GetCategoryModel>> Get(int catgoryId)
+        public async Task<PaginationBaseResposne<List<GetCategoryModel>>> Get(int pageNumber, int pageSize)
         {
-            var cacheKey = $"category_{catgoryId}";
-            var cachedCategory = await _cacheService.Get<GetCategoryModel>(cacheKey);
-            if (cachedCategory != null)
+            pageNumber = pageNumber <= 0 ? _paginationOptions.DefaultPageNumber : pageNumber;
+            pageSize = pageSize <= 0 ? _paginationOptions.DefaultPageSize : Math.Min(pageSize, _paginationOptions.MaxPageSize);
+            var version = await _cacheService.GetVersion(CacheKeys.CategoryVersion);
+
+            var cacheKey = GenerateListCacheKey(version, pageNumber, pageSize);
+
+            var cachedData =
+                await _cacheService.Get<PaginationBaseResposne<List<GetCategoryModel>>>(cacheKey);
+
+            if (cachedData != null)
+                return cachedData;
+
+            var data =
+                await _categoryRepository.Get(pageNumber, pageSize);
+
+            if (data == null)
             {
-                return new BaseResponse<GetCategoryModel>
+                return new PaginationBaseResposne<List<GetCategoryModel>>
                 {
-                    Data = cachedCategory,
-                    IsSuccess = true,
-                    Code = (int)HttpStatusCode.OK,
-                    Message = "با موفقیت دریافت گردید."
+                    Code = (int)HttpStatusCode.NoContent,
+                    IsSuccess = false,
+                    Message = "اطلاعاتی یافت نشد."
                 };
             }
 
+            await _cacheService.Set(
+                cacheKey,
+                data,
+                TimeSpan.FromMinutes(5));
 
-            var data = await _categoryRepository.Get(catgoryId);
+            return data;
+        }
+
+        public async Task<BaseResponse<GetCategoryModel>> Get(int categoryId)
+        {
+            var version =
+                await _cacheService.GetVersion(CacheKeys.CategoryVersion);
+
+            var cacheKey =
+                GenerateDetailCacheKey(version, categoryId);
+
+            var cachedCategory =
+                await _cacheService.Get<BaseResponse<GetCategoryModel>>(cacheKey);
+
+            if (cachedCategory != null)
+                return cachedCategory;
+
+            var data =
+                await _categoryRepository.Get(categoryId);
+
             if (data == null)
             {
                 return new BaseResponse<GetCategoryModel>
                 {
                     Code = (int)HttpStatusCode.NoContent,
-                    IsSuccess = true,
-                    Message = "اطلاعاتی یافت نگردید."
+                    IsSuccess = false,
+                    Message = "اطلاعاتی یافت نشد."
                 };
             }
-            await _cacheService.Set(cacheKey, data.Data, TimeSpan.FromMinutes(5));
+
+            await _cacheService.Set(
+                cacheKey,
+                data,
+                TimeSpan.FromMinutes(5));
+
             return data;
         }
 
         public async Task<BaseResponse> Insert(AddCategoryModel model)
         {
-            await _cacheService.Remove("category_all");
-            return await _categoryRepository.Insert(model);
+            var result =
+                await _categoryRepository.Insert(model);
+
+            if (result.IsSuccess)
+            {
+                await _cacheService.IncrementVersion(CacheKeys.CategoryVersion);
+            }
+
+            return result;
         }
+
 
         public async Task<BaseResponse> Update(UpdateCategoryModel model)
         {
-            await _cacheService.Remove("category_all");
-            return await _categoryRepository.Update(model);
+            var result =
+                await _categoryRepository.Update(model);
+
+            if (result.IsSuccess)
+            {
+                await _cacheService.IncrementVersion(CacheKeys.CategoryVersion);
+            }
+
+            return result;
         }
+
 
         public async Task<BaseResponse> Delete(int categoryId)
         {
-            await _cacheService.Remove("category_all");
-            return await _categoryRepository.Delete(categoryId);
+            var result =
+                await _categoryRepository.Delete(categoryId);
+
+            if (result.IsSuccess)
+            {
+                await _cacheService.IncrementVersion(CacheKeys.CategoryVersion);
+            }
+
+            return result;
+        }
+        private string GenerateListCacheKey(
+            int version,
+            int pageNumber,
+            int pageSize)
+        {
+            return $"category_v{version}_list_{pageNumber}_{pageSize}";
+        }
+
+
+        private string GenerateDetailCacheKey(
+            int version,
+            int categoryId)
+        {
+            return $"category_v{version}_detail_{categoryId}";
         }
     }
 }
