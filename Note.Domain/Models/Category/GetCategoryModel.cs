@@ -1,11 +1,11 @@
 ﻿using Note.Domain.Common;
 
-namespace Note.Domain.Tag
+namespace Note.Domain.Models.Category
 {
-    public class GetTagModel
+    public class GetCategoryModel
     {
-        public int TagId { get; set; }
-        public string TagName { get; set; }
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
         public DateTime? CreateDateTime { get; set; }
         public string ShamsiCreateDateTime => CreateDateTime.ToShamsi();
         public DateTime? ModifyDateTime { get; set; }

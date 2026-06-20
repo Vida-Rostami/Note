@@ -1,19 +1,21 @@
 ﻿using Note.Api.Middleware;
-using Note.Domain;
+using Note.Application.Services.Category;
+using Note.Application.Services.Note;
+using Note.Application.Services.Tag;
 using Note.Infrastructure.Caching;
 using Note.Infrastructure.Category;
 using Note.Infrastructure.Log.AppLogger;
 using Note.Infrastructure.Log.ExceptionLoggerService;
 using Note.Infrastructure.Note;
 using Note.Infrastructure.Tag;
-using Note.Domain;
-using Note.Infrastructure.Log.AppLogger;
-using Note.Infrastructure.Caching;
-using Microsoft.AspNetCore.RateLimiting;
-using Note.Application.Services.Category;
-using Note.Application.Services.Tag;
-using Note.Application.Services.Note;
-using System.Configuration;
+using StackExchange.Redis;
+using FluentValidation;
+using Note.Domain.Common;
+using Note.Domain.Settings;
+using Microsoft.Extensions.DependencyInjection;
+using FluentValidation.AspNetCore;
+using Note.Application.Validation;
+using System.Threading.RateLimiting;
 
 namespace Note.Api
 {
@@ -30,6 +32,16 @@ namespace Note.Api
 
             builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("ConnectionStrings"));
             builder.Services.Configure<PaginationSettings>(builder.Configuration.GetSection("PaginationSettings"));
+            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var configuration = builder.Configuration.GetSection("Redis:ConnectionString").Value;
+
+                return ConnectionMultiplexer.Connect(configuration);
+            });
+            // builder.Services.AddAutoMapper(typeof(ProfileMapper).Assembly);
+
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddValidatorsFromAssemblyContaining<AddNoteValidator>();
             builder.Services.AddScoped<INoteServices, NoteServices>();
             builder.Services.AddScoped<ITagServices, TagServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
@@ -42,39 +54,37 @@ namespace Note.Api
             builder.Services.AddScoped<IAppLogger, AppLogger>();
             builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
-            builder.Services.AddStackExchangeRedisCache(options =>
-            {
-                options.Configuration = builder.Configuration.GetSection("Redis:ConnectionString").Value;
-                options.InstanceName = "NoteApp";
-            });
+            //builder.Services.AddStackExchangeRedisCache(options =>
+            //{
+            //    options.Configuration = builder.Configuration.GetSection("Redis:ConnectionString").Value;
+            //    options.InstanceName = "NoteApp";
+            //});
             builder.Services.AddRateLimiter(options =>
             {
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-                //options.AddTokenBucketLimiter("token", limiterOptions =>
-                //{
-                //    limiterOptions.TokenLimit = 1;
-                //    limiterOptions.TokensPerPeriod = 1;
-                //    limiterOptions.ReplenishmentPeriod = TimeSpan.FromMinutes(1);
-                //    limiterOptions.AutoReplenishment = true;
-                //});
-                //options.AddPolicy("ip_token_burst", context =>
-                //{
-                //    var ip = context.Connection.RemoteIpAddress?.ToString();
-                //    return RateLimitPartition.GetTokenBucketLimiter(
-                //        partitionKey: ip ?? "unknown",
-                //            factory: _ => new TokenBucketRateLimiterOptions
-                //            {
-                //                TokenLimit = 100,
-                //                TokensPerPeriod = 20,
-                //                ReplenishmentPeriod = TimeSpan.FromMinutes(1),
-                //                AutoReplenishment = true,
-                //                QueueLimit = 0
-                //            }
-                //    );
-                //});
+
+
+                options.AddPolicy("ip_token_burst", context =>
+                {
+                    var ip = context.Connection.RemoteIpAddress?.ToString();
+
+                    return RateLimitPartition.GetTokenBucketLimiter(
+                        partitionKey: ip ?? "unknown",
+                        factory: _ => new TokenBucketRateLimiterOptions
+                        {
+                            TokenLimit = 3,
+                            TokensPerPeriod = 3,
+                            ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                            AutoReplenishment = true,
+                            QueueLimit = 0
+                        });
+                });
+
+
                 options.OnRejected = async (context, token) =>
                 {
                     context.HttpContext.Response.ContentType = "application/json";
+
                     await context.HttpContext.Response.WriteAsJsonAsync(new
                     {
                         isSuccess = false,

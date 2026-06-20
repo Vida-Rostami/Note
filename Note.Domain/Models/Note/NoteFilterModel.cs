@@ -1,6 +1,6 @@
 ﻿using Note.Domain.Pagination;
 
-namespace Note.Domain.Note
+namespace Note.Domain.Models.Note
 {
     public class NoteFilterModel : PaginationParams
     {

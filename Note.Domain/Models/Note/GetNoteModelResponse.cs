@@ -1,6 +1,6 @@
 ﻿using Note.Domain.Common;
 
-namespace Note.Domain.Note
+namespace Note.Domain.Models.Note
 {
     public class GetNoteModelResponse
     {
@@ -10,7 +10,7 @@ namespace Note.Domain.Note
         public int CategoryId { get; set; }
         public string? CategoryName { get; set; }
         public List<int>? Tag { get; set; }
-        public List<String>? TagName { get; set; }
+        public List<string>? TagName { get; set; }
         public int IsEditable { get; set; }
         public DateTime? CreateDateTime { get; set; }
         public string ShamsiCreateDateTime => CreateDateTime.ToShamsi();

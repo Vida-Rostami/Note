@@ -1,14 +1,14 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
-using Note.Domain;
-using Note.Domain.Category;
-using Oracle.ManagedDataAccess.Client;
-using System.Data;
-using Note.Domain.Pagination;
-using System.Net;
-using Oracle.ManagedDataAccess.Types;
+using Note.Domain.Models.Category;
+using Note.Domain.Response;
+using Note.Domain.Settings;
 using Note.Infrastructure.Common.Retry;
+using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 using Polly;
+using System.Data;
+using System.Net;
 
 namespace Note.Infrastructure.Category
 {
@@ -114,7 +114,7 @@ namespace Note.Infrastructure.Category
                 };
             });
         }
-        
+
         public async Task<BaseResponse> Insert(AddCategoryModel model)
         {
             return await _policy.ExecuteAsync(async () =>

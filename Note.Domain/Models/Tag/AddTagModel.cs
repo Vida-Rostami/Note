@@ -1,4 +1,4 @@
-﻿namespace Note.Domain.Tag
+﻿namespace Note.Domain.Models.Tag
 {
     public class AddTagModel
     {

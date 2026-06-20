@@ -1,6 +1,6 @@
-﻿namespace Note.Domain
+﻿namespace Note.Domain.Response
 {
-    public  class BaseResponse
+    public class BaseResponse
     {
         public bool IsSuccess { get; set; }
         public int Code { get; set; }
@@ -8,7 +8,7 @@
 
     }
 
-    public class BaseResponse<T> :BaseResponse
+    public class BaseResponse<T> : BaseResponse
     {
         public T Data { get; set; }
 

@@ -1,8 +1,7 @@
-﻿using Note.Infrastructure.Tag;
-using Note.Domain;
-using Note.Domain.Tag;
+﻿using Note.Domain.Models.Tag;
+using Note.Domain.Response;
 using Note.Infrastructure.Caching;
-using Note.Domain.Category;
+using Note.Infrastructure.Tag;
 using System.Net;
 
 namespace Note.Application.Services.Tag

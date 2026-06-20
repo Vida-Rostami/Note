@@ -1,4 +1,4 @@
-﻿using Note.Domain;
+﻿using Note.Domain.Common;
 using Note.Domain.Log;
 using Note.Infrastructure.Log.ExceptionLoggerService;
 using System.ComponentModel.DataAnnotations;

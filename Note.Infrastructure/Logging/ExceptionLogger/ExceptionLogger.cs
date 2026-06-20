@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
-using Note.Domain;
 using Note.Domain.Log;
+using Note.Domain.Settings;
 using Oracle.ManagedDataAccess.Client;
 
 namespace Note.Infrastructure.Log.ExceptionLoggerService

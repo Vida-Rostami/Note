@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Note.Application.Services.Tag;
-using Note.Domain;
-using Note.Domain.Tag;
+using Note.Domain.Models.Tag;
+using Note.Domain.Response;
 
 namespace Note.Api.Controllers
 {

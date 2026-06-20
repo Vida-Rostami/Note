@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
-using Note.Domain;
 using Note.Domain.Common;
-using Note.Domain.Note;
-using Note.Domain.Pagination;
+using Note.Domain.Models.Note;
+using Note.Domain.Response;
+using Note.Domain.Settings;
 using Note.Infrastructure.Common.Retry;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
@@ -32,74 +32,74 @@ namespace Note.Infrastructure.Note
             return await _policy.ExecuteAsync(async () =>
             {
                 using var connection = new OracleConnection(_databaseOptions.OracleConnection);
-                    await connection.OpenAsync();
-                    using var command = new OracleCommand("Sp_GetAllNote", connection)
+                await connection.OpenAsync();
+                using var command = new OracleCommand("Sp_GetAllNote", connection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                command.Parameters.Add("p_Title", OracleDbType.NVarchar2).Value = string.IsNullOrWhiteSpace(model.Title) ? (object)DBNull.Value : model.Title;
+                command.Parameters.Add("p_Text", OracleDbType.NVarchar2).Value = string.IsNullOrWhiteSpace(model.Text) ? (object)DBNull.Value : model.Text;
+                command.Parameters.Add("p_CategoryId", OracleDbType.Int32).Value = model.CategoryId.HasValue ? (object)model.CategoryId.Value : DBNull.Value;
+                command.Parameters.Add("p_TagId", OracleDbType.Int32).Value = model.TagId.HasValue ? (object)model.TagId.Value : DBNull.Value;
+                command.Parameters.Add("p_FromDate", OracleDbType.Date).Value = string.IsNullOrWhiteSpace(model.PersianFromDate) ? (object)DBNull.Value : (object)ConvertDate.ConvertPersianToGregorian(model.PersianFromDate);
+                command.Parameters.Add("p_ToDate", OracleDbType.Date).Value = string.IsNullOrWhiteSpace(model.PersianToDate) ? (object)DBNull.Value : (object)ConvertDate.ConvertPersianToGregorian(model.PersianToDate);
+                command.Parameters.Add("p_PageNumber", OracleDbType.Int32).Value = pageNumber;
+                command.Parameters.Add("p_PageSize", OracleDbType.Int32).Value = pageSize;
+                command.Parameters.Add("p_TotalCount", OracleDbType.Int32).Direction = ParameterDirection.Output;
+                command.Parameters.Add("p_Cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+
+                using var reader = await command.ExecuteReaderAsync();
+
+                var notesDictionary = new Dictionary<int, GetNoteModelResponse>();
+
+                while (await reader.ReadAsync())
+                {
+                    int noteId = reader.GetInt32(reader.GetOrdinal("NoteId"));
+
+                    if (!notesDictionary.TryGetValue(noteId, out var note))
                     {
-                        CommandType = CommandType.StoredProcedure
-                    };
-                    command.Parameters.Add("p_Title", OracleDbType.NVarchar2).Value = string.IsNullOrWhiteSpace(model.Title) ? (object)DBNull.Value : model.Title;
-                    command.Parameters.Add("p_Text", OracleDbType.NVarchar2).Value = string.IsNullOrWhiteSpace(model.Text) ? (object)DBNull.Value : model.Text;
-                    command.Parameters.Add("p_CategoryId", OracleDbType.Int32).Value = model.CategoryId.HasValue ? (object)model.CategoryId.Value : DBNull.Value;
-                    command.Parameters.Add("p_TagId", OracleDbType.Int32).Value = model.TagId.HasValue ? (object)model.TagId.Value : DBNull.Value;
-                    command.Parameters.Add("p_FromDate", OracleDbType.Date).Value = string.IsNullOrWhiteSpace(model.PersianFromDate) ? (object)DBNull.Value : (object)ConvertDate.ConvertPersianToGregorian(model.PersianFromDate);
-                    command.Parameters.Add("p_ToDate", OracleDbType.Date).Value = string.IsNullOrWhiteSpace(model.PersianToDate) ? (object)DBNull.Value : (object)ConvertDate.ConvertPersianToGregorian(model.PersianToDate);
-                    command.Parameters.Add("p_PageNumber", OracleDbType.Int32).Value = pageNumber;
-                    command.Parameters.Add("p_PageSize", OracleDbType.Int32).Value = pageSize;
-                    command.Parameters.Add("p_TotalCount", OracleDbType.Int32).Direction = ParameterDirection.Output;
-                    command.Parameters.Add("p_Cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
-
-                    using var reader = await command.ExecuteReaderAsync();
-
-                    var notesDictionary = new Dictionary<int, GetNoteModelResponse>();
-
-                    while (await reader.ReadAsync())
-                    {
-                        int noteId = reader.GetInt32(reader.GetOrdinal("NoteId"));
-
-                        if (!notesDictionary.TryGetValue(noteId, out var note))
+                        note = new GetNoteModelResponse
                         {
-                            note = new GetNoteModelResponse
-                            {
-                                NoteId = noteId,
-                                Title = reader["Title"]?.ToString(),
-                                Text = reader["Text"]?.ToString(),
-                                CategoryName = reader["CategoryName"]?.ToString(),
-                                CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId")),
-                                Tag = new List<int>(),
-                                TagName = new List<string>(),
-                                CreateDateTime = reader.IsDBNull(reader.GetOrdinal("CreateDateTime")) ? null : reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
-                                ModifyDateTime = reader.IsDBNull(reader.GetOrdinal("ModifyDateTime")) ? null : reader.GetDateTime(reader.GetOrdinal("ModifyDateTime")),
-                                IsEditable = reader.GetInt32(reader.GetOrdinal("IsEditable"))
-                            };
+                            NoteId = noteId,
+                            Title = reader["Title"]?.ToString(),
+                            Text = reader["Text"]?.ToString(),
+                            CategoryName = reader["CategoryName"]?.ToString(),
+                            CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId")),
+                            Tag = new List<int>(),
+                            TagName = new List<string>(),
+                            CreateDateTime = reader.IsDBNull(reader.GetOrdinal("CreateDateTime")) ? null : reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
+                            ModifyDateTime = reader.IsDBNull(reader.GetOrdinal("ModifyDateTime")) ? null : reader.GetDateTime(reader.GetOrdinal("ModifyDateTime")),
+                            IsEditable = reader.GetInt32(reader.GetOrdinal("IsEditable"))
+                        };
 
-                            notesDictionary.Add(noteId, note);
-                        }
-                        var tagName = reader["TagName"]?.ToString();
-                        if (!string.IsNullOrEmpty(tagName) && !note.TagName.Contains(tagName))
-                        {
-                            note.TagName.Add(tagName);
-                        }
+                        notesDictionary.Add(noteId, note);
                     }
-
-                    var totalObj = command.Parameters["p_TotalCount"].Value;
-
-                    var totalCount = totalObj == null || totalObj == DBNull.Value
-                        ? 0
-                        : ((OracleDecimal)totalObj).ToInt32();
-
-                    var notes = notesDictionary.Values.ToList();
-
-                    return new PaginationBaseResposne<List<GetNoteModelResponse>>
+                    var tagName = reader["TagName"]?.ToString();
+                    if (!string.IsNullOrEmpty(tagName) && !note.TagName.Contains(tagName))
                     {
-                        PageNumber = pageNumber,
-                        PageSize = pageSize,
-                        TotalCount = totalCount,
-                        IsSuccess = notes.Any(),
-                        Data = notes,
-                        Code = notes.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.NoContent,
-                        Message = notes.Any() ? "اطلاعات با موفقیت دریافت گردید." : "اطلاعاتی یافت نشد"
-                    };
-                });
+                        note.TagName.Add(tagName);
+                    }
+                }
+
+                var totalObj = command.Parameters["p_TotalCount"].Value;
+
+                var totalCount = totalObj == null || totalObj == DBNull.Value
+                    ? 0
+                    : ((OracleDecimal)totalObj).ToInt32();
+
+                var notes = notesDictionary.Values.ToList();
+
+                return new PaginationBaseResposne<List<GetNoteModelResponse>>
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalCount = totalCount,
+                    IsSuccess = notes.Any(),
+                    Data = notes,
+                    Code = notes.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.NoContent,
+                    Message = notes.Any() ? "اطلاعات با موفقیت دریافت گردید." : "اطلاعاتی یافت نشد"
+                };
+            });
         }
         public async Task<BaseResponse<GetNoteModelResponse>> GetNote(int noteId)
         {

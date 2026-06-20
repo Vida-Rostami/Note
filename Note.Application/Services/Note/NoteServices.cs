@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 using Note.Application.Commons;
-using Note.Domain;
-using Note.Domain.Note;
-using Note.Domain.Pagination;
+using Note.Domain.Models.Note;
+using Note.Domain.Response;
+using Note.Domain.Settings;
 using Note.Infrastructure.Caching;
 using Note.Infrastructure.Note;
 using System.Net;
@@ -23,9 +23,12 @@ namespace Note.Application.Services.Note
         public async Task<PaginationBaseResposne<List<GetNoteModelResponse>>> GetNote(NoteFilterModel model)
         {
             var pageNumber = model.PageNumber <= 0 ? _paginationOptions.DefaultPageNumber : model.PageNumber;
+
             var pageSize = model.PageSize <= 0 ? _paginationOptions.DefaultPageSize : Math.Min(model.PageSize, _paginationOptions.MaxPageSize);
+
             model.PageNumber = pageNumber;
             model.PageSize = pageSize;
+
             var version = await _cacheService.GetVersion(CacheKeys.NoteVersion);
             var cacheKey = GenerateListCacheKey(version, model);
 
@@ -34,32 +37,31 @@ namespace Note.Application.Services.Note
             if (cachedData != null)
                 return cachedData;
 
-            var result = await _noteRepository.GetNote(model);
+            var  result = await _noteRepository.GetNote(model);
 
-            if (result == null)
+            if (result == null )
+            {
                 return new PaginationBaseResposne<List<GetNoteModelResponse>>
                 {
                     Code = (int)HttpStatusCode.NoContent,
                     IsSuccess = false,
                     Message = "اطلاعاتی یافت نشد."
                 };
+            }
 
             await _cacheService.Set(cacheKey, result, TimeSpan.FromMinutes(5));
-
             return result;
         }
 
-        public async Task<BaseResponse<GetNoteModelResponse>> GetNote(int noteId)
+        public async Task<BaseResponse<GetNoteModelResponse>> GetNote(int id)
         {
-            var version = await _cacheService.GetVersion(CacheKeys.NoteVersion);
-            var cacheKey =   GenerateDetailCacheKey(version, noteId);
+            var cacheKey = $"note_detail_{id}";
 
-            var cachedNote = await _cacheService.Get<BaseResponse<GetNoteModelResponse>>(cacheKey);
+            var cached = await _cacheService.Get<BaseResponse<GetNoteModelResponse>>(cacheKey);
+            if (cached != null)
+                return cached;
 
-            if (cachedNote != null)
-                return cachedNote;
-
-            var result = await _noteRepository.GetNote(noteId);
+            var result = await _noteRepository.GetNote(id);
 
             if (result == null)
             {
@@ -70,46 +72,91 @@ namespace Note.Application.Services.Note
                     Message = "اطلاعاتی یافت نشد."
                 };
             }
-
-            await _cacheService.Set(cacheKey, result, TimeSpan.FromMinutes(5));
-
+            await _cacheService.Set(cacheKey, result, TimeSpan.FromMinutes(10));
             return result;
         }
 
         public async Task<BaseResponse> InsertNote(AddNoteModel model)
         {
             var result = await _noteRepository.InsertNote(model);
-            if (result.IsSuccess)
+
+            if (result == null)
             {
-                await _cacheService.IncrementVersion(CacheKeys.NoteVersion);
+                return new BaseResponse
+                {
+                    IsSuccess = false,
+                    Code = (int)HttpStatusCode.BadRequest,
+                    Message = "خطا در ثبت اطلاعات"
+                };
             }
-            return result;
+
+            await _cacheService.IncrementVersion(CacheKeys.NoteVersion);
+
+            return new BaseResponse
+            {
+                IsSuccess = true,
+                Code = (int)HttpStatusCode.Created,
+                Message = "با موفقیت ثبت شد"
+            };
         }
 
-        public async Task<BaseResponse> UpdateNote(UpdateNoteModel model)
+        public async Task<BaseResponse> UpdateNote(UpdateNoteModel dto)
         {
+            var model = new UpdateNoteModel
+            {
+                NoteId = dto.NoteId,
+                Title = dto.Title,
+                Text = dto.Text,
+                CategoryId = dto.CategoryId,
+                Tags = dto.Tags
+            };
+
             var result = await _noteRepository.UpdateNote(model);
 
-            if (result.IsSuccess)
+            if (result == null)
             {
-                await _cacheService.IncrementVersion(CacheKeys.NoteVersion);
+                return new BaseResponse
+                {
+                    IsSuccess = false,
+                    Code = (int)HttpStatusCode.NotFound,
+                    Message = "یادداشت یافت نشد"
+                };
             }
 
-            return result;
+            await _cacheService.IncrementVersion(CacheKeys.NoteVersion);
+
+            return new BaseResponse
+            {
+                IsSuccess = true,
+                Code = (int)HttpStatusCode.OK,
+                Message = "با موفقیت بروزرسانی شد"
+            };
         }
         public async Task<BaseResponse> DeleteNote(int noteId)
         {
             var result = await _noteRepository.DeleteNote(noteId);
 
-            if (result.IsSuccess)
+            if (result == null)
             {
-                await _cacheService.IncrementVersion(CacheKeys.NoteVersion);
+                return new BaseResponse
+                {
+                    IsSuccess = false,
+                    Code = (int)HttpStatusCode.NotFound,
+                    Message = "یادداشت یافت نشد"
+                };
             }
 
-            return result;
+            await _cacheService.IncrementVersion(CacheKeys.NoteVersion);
+
+            return new BaseResponse
+            {
+                IsSuccess = true,
+                Code = (int)HttpStatusCode.OK,
+                Message = "با موفقیت حذف شد"
+            };
         }
 
-        private string GenerateListCacheKey( int version,  NoteFilterModel model)
+        private string GenerateListCacheKey(int version, NoteFilterModel model)
         {
             return
                 $"note_v{version}_list_" +

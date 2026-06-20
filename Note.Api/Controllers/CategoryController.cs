@@ -1,15 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Note.Application.Services.Category;
-using Note.Domain;
-using Note.Domain.Category;
-using Note.Domain.Pagination;
+using Note.Domain.Models.Category;
+using Note.Domain.Response;
 
 namespace Note.Api.Controllers
 {
     [EnableRateLimiting("ip_token_burst")]
     [Route("api/v1/[controller]/[action]")]
-     [ApiController]
+    [ApiController]
     public class CategoryController
     {
         private readonly ICategoryServices _categoryServices;
@@ -18,8 +17,6 @@ namespace Note.Api.Controllers
         {
             _categoryServices = categoryServices;
         }
-
-        //add update by http method
 
         [HttpGet]
         public async Task<PaginationBaseResposne<List<GetCategoryModel>>> Get(int pageNumber = 1, int pageSize = 10)

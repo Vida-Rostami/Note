@@ -1,4 +1,4 @@
-﻿namespace Note.Domain
+﻿namespace Note.Domain.Settings
 {
     public class DatabaseSettings
     {

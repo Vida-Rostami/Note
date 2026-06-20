@@ -1,6 +1,5 @@
-﻿using Note.Domain;
-using Note.Domain.Note;
-using Note.Domain.Pagination;
+﻿using Note.Domain.Models.Note;
+using Note.Domain.Response;
 
 namespace Note.Infrastructure.Note
 {

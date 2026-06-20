@@ -1,4 +1,4 @@
-﻿namespace Note.Domain
+﻿namespace Note.Domain.Common
 {
     public static class ErrorMessages
     {

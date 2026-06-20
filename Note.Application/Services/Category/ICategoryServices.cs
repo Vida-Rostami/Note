@@ -1,6 +1,5 @@
-﻿using Note.Domain;
-using Note.Domain.Category;
-using Note.Domain.Pagination;
+﻿using Note.Domain.Models.Category;
+using Note.Domain.Response;
 
 namespace Note.Application.Services.Category
 {

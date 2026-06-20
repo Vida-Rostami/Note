@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
 using Note.Application.Commons;
-using Note.Domain;
-using Note.Domain.Category;
-using Note.Domain.Pagination;
+using Note.Domain.Models.Category;
+using Note.Domain.Response;
+using Note.Domain.Settings;
 using Note.Infrastructure.Caching;
 using Note.Infrastructure.Category;
 using System.Net;
-using System.Reflection;
 
 namespace Note.Application.Services.Category
 {
@@ -37,8 +36,7 @@ namespace Note.Application.Services.Category
             if (cachedData != null)
                 return cachedData;
 
-            var data =
-                await _categoryRepository.Get(pageNumber, pageSize);
+            var data = await _categoryRepository.Get(pageNumber, pageSize);
 
             if (data == null)
             {
